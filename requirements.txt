@@ -9,3 +9,10 @@ web3>=6.15.0
 eth-account>=0.11.0
 asyncio-throttle>=1.0.2
 structlog>=24.1.0
+
+# RL training
+gymnasium>=0.29.0
+stable-baselines3>=2.3.0
+pandas-ta>=0.3.14b
+matplotlib>=3.8.0
+torch>=2.2.0
