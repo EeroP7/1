@@ -1,18 +1,23 @@
 """
 Execution engine + risk management.
 
-Decides whether to enter a trade, sizes the position, places the order,
-monitors for fill / stop / target, and tracks daily P&L.
+Arbitrage logic:
+  1. Compute fair YES price from Binance futures mark price momentum
+  2. Compare to Polymarket CLOB YES/NO ask
+  3. Enter when |fair_value - clob_price| > LAG_THRESHOLD (0.3%)
+     AND force-graph clusters have converged
+  4. Exit on target (+0.5%), hard stop (-0.4%), or window expiry
 """
 import asyncio
+import math
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
 from config import (
     STARTING_BALANCE, PER_TRADE_RISK, DAILY_CAP_RISK, HARD_STOP,
-    MIN_LIQUIDITY, MAX_SPREAD, LAG_THRESHOLD, SLIPPAGE_LIMIT,
+    MIN_LIQUIDITY, MAX_SPREAD, LAG_THRESHOLD, SLIPPAGE_LIMIT, EDGE_EXPIRE_MS,
 )
 from feeds.binance_ws import BtcSnapshot
 from feeds.indicators import IndicatorSet
@@ -28,7 +33,7 @@ class TradeOutcome(str, Enum):
 
 @dataclass
 class TradeRecord:
-    side: str                  # "YES" or "NO"
+    side: str
     entry_price: float
     exit_price: float
     size: float
@@ -38,6 +43,8 @@ class TradeRecord:
     entry_time_ms: int
     exit_time_ms: int
     hold_ms: int
+    lag_at_entry: float      # mark_price_lag when trade was entered
+    edge_age_ms: int         # ms from edge detection to order placement
 
 
 @dataclass
@@ -65,28 +72,37 @@ class RiskState:
             self.skips += 1
 
 
+def _fair_yes_from_mark(snap: BtcSnapshot) -> float:
+    """
+    Estimate fair probability of BTC going up in current 5min window
+    using Binance futures mark price momentum relative to window open.
+
+    Uses a logistic function scaled to 0.5% moves ≈ full confidence.
+    """
+    mark = snap.mark_price
+    if mark <= 0 or not snap.klines:
+        return 0.5
+    window_open = snap.klines[-1].open   # current 5m candle open
+    move_pct = (mark - window_open) / (window_open + 1e-9)
+    # tanh saturates at ±0.5%: beyond that we're confident in direction
+    return 0.5 + 0.5 * math.tanh(move_pct / 0.005)
+
+
 class ExecutionEngine:
     """
-    One active trade at a time to keep risk controlled.
-    Runs a tight event loop:
-      1. Pre-flight checks (risk limits, liquidity, spread, signal quality)
-      2. Edge detection (CLOB vs spot lag + graph convergence)
-      3. Order placement + fill monitoring
-      4. Exit on target / stop / timeout
+    One active position at a time.
+    Edge detection: Binance futures mark price fair value vs Polymarket CLOB.
     """
 
-    FILL_POLL_INTERVAL = 0.05   # 50ms
-    MAX_HOLD_SECONDS   = 290    # exit before next 5-min window
-    TARGET_PROFIT_PCT  = 0.005  # 0.5% target
+    MAX_HOLD_SECONDS = 290    # force exit before window rolls over
+    TARGET_PROFIT    = 0.005  # +0.5% of position value
 
     def __init__(self, clob: PolymarketClient) -> None:
         self._clob = clob
         self._risk = RiskState(balance=STARTING_BALANCE)
         self._history: list[TradeRecord] = []
         self._active: Optional[OpenPosition] = None
-        self._last_trade_time = 0
-
-    # ── public ────────────────────────────────────────────────────────────────
+        self._edge_detected_at: int = 0   # ms timestamp of edge detection
 
     @property
     def risk(self) -> RiskState:
@@ -103,22 +119,30 @@ class ExecutionEngine:
         market: MarketState,
         signal: GraphSignal,
     ) -> Optional[TradeRecord]:
-        """
-        Main entry point called on every tick.
-        Returns a TradeRecord if a trade was completed this tick, else None.
-        """
         if self._active:
-            return await self._monitor_active(market, snap)
+            return await self._monitor_active(market)
 
-        skip_reason = self._pre_flight(market, signal)
-        if skip_reason:
+        reason = self._pre_flight(market, signal)
+        if reason:
             return None
 
         edge = self._detect_edge(snap, market, signal)
         if not edge:
+            self._edge_detected_at = 0
             return None
 
-        return await self._execute(edge, market, snap, signal)
+        # First tick we see an edge: record the time
+        now = int(time.time() * 1000)
+        if not self._edge_detected_at:
+            self._edge_detected_at = now
+
+        # Discard stale edges (>EDGE_EXPIRE_MS old)
+        edge_age = now - self._edge_detected_at
+        if edge_age > EDGE_EXPIRE_MS:
+            self._edge_detected_at = 0
+            return None
+
+        return await self._execute(edge, edge_age, signal)
 
     # ── pre-flight ────────────────────────────────────────────────────────────
 
@@ -128,26 +152,28 @@ class ExecutionEngine:
             return r.halt_reason
         if r.daily_pnl_pct <= -DAILY_CAP_RISK:
             r.halted = True
-            r.halt_reason = "daily cap hit"
+            r.halt_reason = "daily cap -2%"
             return r.halt_reason
         if not signal.converged:
             return "no convergence"
         if signal.confidence < 0.65:
             return "low confidence"
-        # liquidity check
+        if signal.separation < 1.5:
+            return "clusters not separated"
+        # liquidity
         if signal.bias == Bias.BULL:
             liq = market.yes_ask_size * market.yes_ask
         else:
             liq = market.no_ask_size * market.no_ask
         if liq < MIN_LIQUIDITY:
             return "thin liquidity"
-        # spread check
+        # spread
         spread = market.yes_ask - market.yes_bid
         if spread > MAX_SPREAD:
             return "spread too wide"
         return None
 
-    # ── edge detection ────────────────────────────────────────────────────────
+    # ── edge detection (Binance mark price vs Polymarket CLOB) ───────────────
 
     def _detect_edge(
         self,
@@ -156,67 +182,57 @@ class ExecutionEngine:
         signal: GraphSignal,
     ) -> Optional[dict]:
         """
-        Detects a tradeable edge when the Polymarket CLOB lags spot price
-        in the direction confirmed by the force-graph signal.
+        Core arbitrage: Binance futures mark price is the ground truth.
+        Polymarket CLOB reprices with a delay — we exploit that gap.
 
-        Returns a dict with trade parameters or None.
+        fair_yes = P(BTC closes above window_open) derived from mark momentum
+        lag      = fair_yes - clob_yes_ask   (positive → YES is cheap)
         """
-        spot = snap.price
+        fair_yes = _fair_yes_from_mark(snap)
+
         if signal.bias == Bias.BULL:
-            # YES token should be priced closer to 1.0 if BTC is going up
-            # Implied probability from spot momentum vs current YES ask price
             clob_price = market.yes_ask
-            # If the market is underpricing YES given our signal: edge exists
-            # Use (signal confidence - clob_price) as the edge magnitude
-            implied_fair = signal.confidence
-            lag = implied_fair - clob_price
+            lag = fair_yes - clob_price
             if lag < LAG_THRESHOLD:
                 return None
             return {
-                "side": "YES",
-                "token_id": market.yes_token_id,
+                "side":        "YES",
+                "token_id":    market.yes_token_id,
                 "entry_price": clob_price,
-                "implied_fair": implied_fair,
-                "lag": lag,
-                "signal": signal,
+                "fair_value":  fair_yes,
+                "lag":         lag,
             }
-        else:  # BEAR
+        else:
+            fair_no = 1.0 - fair_yes
             clob_price = market.no_ask
-            implied_fair = signal.confidence
-            lag = implied_fair - clob_price
+            lag = fair_no - clob_price
             if lag < LAG_THRESHOLD:
                 return None
             return {
-                "side": "NO",
-                "token_id": market.no_token_id,
+                "side":        "NO",
+                "token_id":    market.no_token_id,
                 "entry_price": clob_price,
-                "implied_fair": implied_fair,
-                "lag": lag,
-                "signal": signal,
+                "fair_value":  fair_no,
+                "lag":         lag,
             }
 
-    # ── execution ─────────────────────────────────────────────────────────────
+    # ── order execution ───────────────────────────────────────────────────────
 
     async def _execute(
         self,
         edge: dict,
-        market: MarketState,
-        snap: BtcSnapshot,
+        edge_age_ms: int,
         signal: GraphSignal,
     ) -> Optional[TradeRecord]:
-        entry_time = int(time.time() * 1000)
         balance = self._risk.balance
-        size_usd = balance * PER_TRADE_RISK
-        price = edge["entry_price"]
+        price   = edge["entry_price"]
         if price <= 0:
             return None
-        size = round(size_usd / price, 2)
+        size = round((balance * PER_TRADE_RISK) / price, 2)
         if size < 1.0:
             return None
 
-        # limit order slightly above ask to maximise fill speed
         limit_price = round(min(price * (1 + SLIPPAGE_LIMIT), 0.99), 4)
-
         order_id = await self._clob.place_order(
             token_id=edge["token_id"],
             side="BUY",
@@ -226,6 +242,7 @@ class ExecutionEngine:
         if not order_id:
             return None
 
+        entry_time = int(time.time() * 1000)
         pos = OpenPosition(
             token_id=edge["token_id"],
             side=edge["side"],
@@ -234,58 +251,48 @@ class ExecutionEngine:
             entry_time_ms=entry_time,
             order_id=order_id,
         )
+        pos._lag_at_entry  = edge["lag"]
+        pos._edge_age_ms   = edge_age_ms
         self._clob.record_position(pos)
         self._active = pos
-        return None  # position opened; will be closed on next monitor call
+        self._edge_detected_at = 0
+        return None
 
     # ── position monitoring ───────────────────────────────────────────────────
 
-    async def _monitor_active(
-        self, market: MarketState, snap: BtcSnapshot
-    ) -> Optional[TradeRecord]:
+    async def _monitor_active(self, market: MarketState) -> Optional[TradeRecord]:
         pos = self._active
         now_ms = int(time.time() * 1000)
         hold_s = (now_ms - pos.entry_time_ms) / 1000
 
-        # current mark price
-        if pos.side == "YES":
-            mark = market.mid_yes
-        else:
-            mark = market.mid_no
+        mark = market.mid_yes if pos.side == "YES" else market.mid_no
+        unrealised_pct = (mark - pos.entry_price) / (pos.entry_price + 1e-9)
 
-        unrealised_pct = (mark - pos.entry_price) / pos.entry_price
-
-        # --- exit conditions ---
-        exit_reason = None
-        if unrealised_pct >= self.TARGET_PROFIT_PCT:
+        exit_reason: Optional[str] = None
+        if unrealised_pct >= self.TARGET_PROFIT:
             exit_reason = f"target +{unrealised_pct:.2%}"
         elif unrealised_pct <= HARD_STOP:
-            exit_reason = f"hard stop {unrealised_pct:.2%}"
+            exit_reason = f"stop {unrealised_pct:.2%}"
         elif hold_s >= self.MAX_HOLD_SECONDS:
             exit_reason = "window expiry"
 
         if not exit_reason:
             return None
 
-        # close the position (market sell)
         exit_price = mark
         exit_time  = int(time.time() * 1000)
         pnl = (exit_price - pos.entry_price) * pos.size
         outcome = TradeOutcome.WIN if pnl > 0 else TradeOutcome.LOSS
 
-        # cancel unfilled order if still open
         order_info = await self._clob.get_order(pos.order_id)
-        if order_info and order_info.get("status") in ("OPEN", "UNMATCHED"):
+        status = order_info.get("status") if order_info else None
+        if status in ("OPEN", "UNMATCHED"):
             await self._clob.cancel_order(pos.order_id)
-        # sell position if filled
-        elif order_info and order_info.get("status") == "MATCHED":
-            if pos.side == "YES":
-                sell_tid = market.yes_token_id
-            else:
-                sell_tid = market.no_token_id
+        elif status == "MATCHED":
+            sell_tid = (market.yes_token_id if pos.side == "YES"
+                        else market.no_token_id)
             await self._clob.place_order(
-                token_id=sell_tid,
-                side="SELL",
+                token_id=sell_tid, side="SELL",
                 size=pos.size,
                 price=round(exit_price * 0.99, 4),
             )
@@ -304,6 +311,8 @@ class ExecutionEngine:
             entry_time_ms=pos.entry_time_ms,
             exit_time_ms=exit_time,
             hold_ms=exit_time - pos.entry_time_ms,
+            lag_at_entry=getattr(pos, "_lag_at_entry", 0.0),
+            edge_age_ms=getattr(pos, "_edge_age_ms", 0),
         )
         self._risk.register_trade(pnl, outcome)
         self._history.append(record)

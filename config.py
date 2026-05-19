@@ -12,11 +12,15 @@ POLY_HOST        = os.getenv("POLY_HOST", "https://clob.polymarket.com")
 POLY_CHAIN_ID    = int(os.getenv("POLY_CHAIN_ID", "137"))  # Polygon mainnet
 
 # ── Binance WebSocket ─────────────────────────────────────────────────────────
-BINANCE_WS_BASE  = "wss://stream.binance.com:9443/stream"
-BINANCE_REST     = "https://api.binance.com"
+BINANCE_WS_BASE       = "wss://stream.binance.com:9443/stream"
+BINANCE_FUTURES_WS    = "wss://fstream.binance.com/stream"   # perpetual futures
+BINANCE_REST          = "https://api.binance.com"
+BINANCE_FUTURES_REST  = "https://fapi.binance.com"
 BTC_SYMBOL       = "btcusdt"
 KLINE_INTERVAL   = "5m"
 KLINE_LIMIT      = 60        # history candles to seed indicators
+DEPTH_LEVELS     = 5         # order book depth levels to track
+AGG_TRADE_WINDOW = 10        # seconds of aggTrade flow to accumulate
 
 # ── Signal / force-graph ──────────────────────────────────────────────────────
 GRAPH_NODES      = 100
