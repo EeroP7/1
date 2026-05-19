@@ -44,3 +44,13 @@ MAX_SPREAD       = 0.015      # skip if spread > 1.5%
 ORDER_SIDE_YES   = "BUY"      # YES = BTC goes UP in the 5min window
 ORDER_SIDE_NO    = "BUY"      # NO  = BTC goes DOWN
 SLIPPAGE_LIMIT   = 0.005      # max 0.5% slippage on fill price
+
+# ── MiroFish swarm intelligence ───────────────────────────────────────────────
+# Run `npm run dev` inside the cloned 666ghj/MiroFish repo first.
+# Set MIROFISH_ENABLED=false to run without MiroFish (force-graph only).
+MIROFISH_HOST          = os.getenv("MIROFISH_HOST", "http://localhost:5001")
+MIROFISH_ENABLED       = os.getenv("MIROFISH_ENABLED", "true").lower() == "true"
+MIROFISH_REFRESH_MIN   = int(os.getenv("MIROFISH_REFRESH_MIN", "15"))  # re-run every N minutes
+MIROFISH_AGENT_COUNT   = int(os.getenv("MIROFISH_AGENT_COUNT", "500"))
+MIROFISH_MIN_CONFIDENCE = 0.60   # minimum swarm confidence to allow trading
+MIROFISH_LLM_API_KEY   = os.getenv("LLM_API_KEY", "")   # same key as MiroFish .env

@@ -1,12 +1,16 @@
 """
 Polymarket BTC UP/DOWN 5MIN scalper — main entry point.
 
-Architecture:
-  BinanceFeed  ──── ticks ──→  ForceGraph  ──→  ExecutionEngine
-      │                             ↑                   │
-      └── BtcSnapshot ──────── Indicators               │
-                                                         ↓
-  PolymarketClient ← market state ────────── order placement
+Signal stack (all three must agree before trading):
+  1. MiroFish swarm     — macro direction from social simulation
+  2. Force-graph        — micro cluster convergence from physics simulation
+  3. Binance mark price — CLOB lag detection (the actual arbitrage edge)
+
+  BinanceFeed ──→ Indicators ──→ ForceGraph ──→ ExecutionEngine
+       │                              │                │
+       │          MirofishClient ─────┘                │
+       │          (refreshes every 15 min)             │
+       └──────────────────────────────────────→ PolymarketClient
 
 Run:
   python main.py
@@ -14,47 +18,52 @@ Run:
 Stop cleanly with Ctrl-C.
 """
 import asyncio
-import math
 import signal
-import sys
 import time
 
+from config import MIROFISH_ENABLED, STARTING_BALANCE
+from execution.engine import ExecutionEngine
 from feeds.binance_ws import BinanceFeed
 from feeds.indicators import compute as compute_indicators
 from polymarket.clob_client import PolymarketClient
 from signal.force_graph import ForceGraph
-from execution.engine import ExecutionEngine
 from terminal.display import Dashboard
-from config import STARTING_BALANCE
-
 
 TICK_INTERVAL_MS = 100   # evaluate every 100ms
 MARKET_POLL_MS   = 200   # refresh Polymarket CLOB every 200ms
 
 
 def _seconds_to_5min_close() -> float:
-    """Seconds remaining until the next 5-minute boundary."""
-    ts = time.time()
-    return 300 - (ts % 300)
+    return 300 - (time.time() % 300)
 
 
 async def main() -> None:
-    # ── initialise components ─────────────────────────────────────────────────
+    # ── initialise core components ────────────────────────────────────────────
     feed   = BinanceFeed()
     graph  = ForceGraph()
     clob   = PolymarketClient()
     engine = ExecutionEngine(clob)
 
-    print("Starting Binance feed…")
+    print("Starting Binance feed (spot + futures + aggTrade)…")
     await feed.start()
     await feed.wait_ready()
-    print("Feed ready. Discovering Polymarket market…")
+    print("Binance feed ready.")
 
+    # ── MiroFish ──────────────────────────────────────────────────────────────
+    mirofish = None
+    if MIROFISH_ENABLED:
+        from mirofish.client import MirofishClient
+        mirofish = MirofishClient()
+        engine.set_mirofish(mirofish)
+        print("MiroFish enabled — will connect to localhost:5001")
+
+    print("Discovering Polymarket BTC UP/DOWN 5MIN market…")
     found = await clob.discover_market()
-    status = "market found" if found else "market not found — running dry"
+    status = "Polymarket market found" if found else "market not found — dry run"
 
     market_state = None
     last_market_poll = 0.0
+    mirofish_started = False
 
     stop_event = asyncio.Event()
 
@@ -70,49 +79,62 @@ async def main() -> None:
         while not stop_event.is_set():
             tick_start = time.monotonic()
 
-            # 1. Fetch latest market state (throttled)
+            # 1. Refresh Polymarket CLOB (throttled)
             now = time.time()
             if found and (now - last_market_poll) * 1000 >= MARKET_POLL_MS:
                 market_state = await clob.get_market_state()
                 last_market_poll = now
 
-            # 2. Snapshot from Binance
+            # 2. Binance snapshot
             snap = await feed.get_snapshot()
             if not snap or not snap.klines:
-                dash.update(None, None, market_state, None,
-                            engine.risk, engine.history, "waiting for data…")
+                dash.update(None, None, market_state, None, None,
+                            engine.risk, engine.history, "waiting for Binance…")
                 await asyncio.sleep(0.05)
                 continue
 
-            # 3. Compute technical indicators
-            ind = compute_indicators(snap.klines, snap.price)
+            # 3. Indicators
+            ind = compute_indicators(snap.klines, snap.effective_price)
 
-            # 4. Evaluate force-graph signal
+            # 4. Start MiroFish background simulation once we have real data
+            if mirofish and not mirofish_started:
+                await mirofish.start(snap, ind)
+                mirofish_started = True
+                status = "MiroFish simulation started…"
+            elif mirofish:
+                await mirofish.update_context(snap, ind)
+
+            # 5. Force-graph signal
             yes_price = market_state.mid_yes if market_state else 0.5
             no_price  = market_state.mid_no  if market_state else 0.5
             ttc = _seconds_to_5min_close()
             sig = graph.evaluate(snap, ind, yes_price, no_price, ttc)
 
-            # 5. Execution decision
+            # 6. Execute (three-layer gate inside engine)
             if market_state and not engine.risk.halted:
                 record = await engine.evaluate_and_trade(snap, ind, market_state, sig)
                 if record:
                     status = (
                         f"{record.outcome.value} {record.side} "
-                        f"{record.pnl:+.2f} | {record.reason}"
+                        f"{record.pnl:+.2f}  lag={record.lag_at_entry:.3f}  "
+                        f"age={record.edge_age_ms}ms | {record.reason}"
                     )
 
-            # 6. Refresh display
-            dash.update(snap, ind, market_state, sig,
+            # 7. Dashboard
+            mf_sig = mirofish.signal if mirofish else None
+            dash.update(snap, ind, market_state, sig, mf_sig,
                         engine.risk, engine.history, status)
 
-            # 7. Pace the loop
+            # 8. Pace
             elapsed_ms = (time.monotonic() - tick_start) * 1000
             sleep_ms   = max(0.0, TICK_INTERVAL_MS - elapsed_ms)
             await asyncio.sleep(sleep_ms / 1000)
 
     # ── shutdown ──────────────────────────────────────────────────────────────
+    if mirofish:
+        await mirofish.stop()
     await feed.stop()
+
     print("\nBot stopped cleanly.")
     r = engine.risk
     print(f"  Balance : ${r.balance:,.2f}  (started ${STARTING_BALANCE:,.2f})")

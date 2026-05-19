@@ -2,27 +2,32 @@
 Execution engine + risk management.
 
 Arbitrage logic:
-  1. Compute fair YES price from Binance futures mark price momentum
-  2. Compare to Polymarket CLOB YES/NO ask
-  3. Enter when |fair_value - clob_price| > LAG_THRESHOLD (0.3%)
-     AND force-graph clusters have converged
-  4. Exit on target (+0.5%), hard stop (-0.4%), or window expiry
+  1. MiroFish swarm signal (macro): must agree on direction
+  2. Force-graph signal (micro):    must converge with separation > 1.5
+  3. Binance futures mark price lag vs Polymarket CLOB > 0.3%
+  → All three must align before placing an order.
+
+Exit on target (+0.5%), hard stop (-0.4%), or window expiry.
 """
 import asyncio
 import math
 import time
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from config import (
     STARTING_BALANCE, PER_TRADE_RISK, DAILY_CAP_RISK, HARD_STOP,
     MIN_LIQUIDITY, MAX_SPREAD, LAG_THRESHOLD, SLIPPAGE_LIMIT, EDGE_EXPIRE_MS,
+    MIROFISH_ENABLED, MIROFISH_MIN_CONFIDENCE,
 )
 from feeds.binance_ws import BtcSnapshot
 from feeds.indicators import IndicatorSet
 from polymarket.clob_client import MarketState, OpenPosition, PolymarketClient
 from signal.force_graph import Bias, GraphSignal
+
+if TYPE_CHECKING:
+    from mirofish.client import MirofishClient, MirofishSignal
 
 
 class TradeOutcome(str, Enum):
@@ -90,19 +95,26 @@ def _fair_yes_from_mark(snap: BtcSnapshot) -> float:
 
 class ExecutionEngine:
     """
-    One active position at a time.
-    Edge detection: Binance futures mark price fair value vs Polymarket CLOB.
+    Three-layer signal stack before any order is placed:
+      1. MiroFish swarm (macro): direction + confidence from social simulation
+      2. Force-graph physics (micro): real-time cluster convergence
+      3. Binance mark price lag vs Polymarket CLOB (the actual arbitrage)
+    All three must agree; any disagreement or missing signal skips the trade.
     """
 
-    MAX_HOLD_SECONDS = 290    # force exit before window rolls over
-    TARGET_PROFIT    = 0.005  # +0.5% of position value
+    MAX_HOLD_SECONDS = 290
+    TARGET_PROFIT    = 0.005
 
     def __init__(self, clob: PolymarketClient) -> None:
-        self._clob = clob
-        self._risk = RiskState(balance=STARTING_BALANCE)
+        self._clob    = clob
+        self._risk    = RiskState(balance=STARTING_BALANCE)
         self._history: list[TradeRecord] = []
         self._active: Optional[OpenPosition] = None
-        self._edge_detected_at: int = 0   # ms timestamp of edge detection
+        self._edge_detected_at: int = 0
+        self._mirofish: Optional["MirofishClient"] = None
+
+    def set_mirofish(self, client: "MirofishClient") -> None:
+        self._mirofish = client
 
     @property
     def risk(self) -> RiskState:
@@ -111,6 +123,10 @@ class ExecutionEngine:
     @property
     def history(self) -> list[TradeRecord]:
         return self._history
+
+    @property
+    def mirofish_signal(self) -> Optional["MirofishSignal"]:
+        return self._mirofish.signal if self._mirofish else None
 
     async def evaluate_and_trade(
         self,
@@ -136,7 +152,6 @@ class ExecutionEngine:
         if not self._edge_detected_at:
             self._edge_detected_at = now
 
-        # Discard stale edges (>EDGE_EXPIRE_MS old)
         edge_age = now - self._edge_detected_at
         if edge_age > EDGE_EXPIRE_MS:
             self._edge_detected_at = 0
@@ -154,20 +169,37 @@ class ExecutionEngine:
             r.halted = True
             r.halt_reason = "daily cap -2%"
             return r.halt_reason
+
+        # ── Layer 1: MiroFish swarm gate ──────────────────────────────────────
+        if MIROFISH_ENABLED and self._mirofish:
+            ms = self._mirofish.signal
+            if not ms.available:
+                return "MiroFish unavailable"
+            if ms.stale:
+                return f"MiroFish signal stale ({ms.age_seconds/60:.1f}m)"
+            if ms.confidence < MIROFISH_MIN_CONFIDENCE:
+                return f"MiroFish low confidence ({ms.confidence:.0%})"
+            if ms.bias == Bias.NEUTRAL:
+                return "MiroFish neutral"
+            # direction must match force-graph
+            if signal.converged and ms.bias != signal.bias:
+                return f"MiroFish/graph mismatch ({ms.bias.value} vs {signal.bias.value})"
+
+        # ── Layer 2: force-graph gate ─────────────────────────────────────────
         if not signal.converged:
-            return "no convergence"
+            return "graph not converged"
         if signal.confidence < 0.65:
-            return "low confidence"
+            return "graph low confidence"
         if signal.separation < 1.5:
             return "clusters not separated"
-        # liquidity
+
+        # ── Liquidity / spread ────────────────────────────────────────────────
         if signal.bias == Bias.BULL:
             liq = market.yes_ask_size * market.yes_ask
         else:
             liq = market.no_ask_size * market.no_ask
         if liq < MIN_LIQUIDITY:
             return "thin liquidity"
-        # spread
         spread = market.yes_ask - market.yes_bid
         if spread > MAX_SPREAD:
             return "spread too wide"
