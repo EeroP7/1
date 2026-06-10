@@ -53,9 +53,12 @@ jobs:
           DSR_THRESHOLD: "0.75"
           TOP_N: "5"
           REBALANCE_FREQ: "M"
-          WEIGHT_MODE: "risk_parity"
-          VOL_TARGET: "0.15"
-          # 20y test: regime filter halves crisis drawdowns (2008) at same Sharpe
+          # residual + regime filter: best 20y Sharpe (1.10) at ~29%/yr.
+          # Vol target dropped by owner's choice: accepts ~-50% drawdowns
+          # for higher long-run return. Regime filter kept — it raises
+          # return AND cuts crisis drawdowns (2008-validated).
+          WEIGHT_MODE: "inv_vol"
+          VOL_TARGET: "0"
           REGIME_FILTER: "1"
           YEARS: "10"
           UNIVERSE: "all"
