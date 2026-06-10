@@ -41,8 +41,8 @@ logger = logging.getLogger("run_picks")
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Daily stock pick generator")
-    p.add_argument("--dry-run", action="store_true", default=True,
-                   help="Generate picks without placing any orders (default)")
+    p.add_argument("--dry-run", action="store_true", default=False,
+                   help="Generate picks without placing any orders")
     p.add_argument("--execute", action="store_true",
                    help="Place basket in Alpaca paper account")
     p.add_argument("--validate", action="store_true",
@@ -171,7 +171,7 @@ def main() -> None:
 
     print_picks(sized, as_of=today, feature_rows=feature_rows)
 
-    if not args.execute or args.dry_run:
+    if args.dry_run or not args.execute:
         write_picks(sized, as_of=today, feature_rows=feature_rows)
         send_alert(sized, as_of=today)
         print(f"\n[DRY RUN] Picks written to output_data/. No orders placed.\n")
