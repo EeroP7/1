@@ -30,7 +30,8 @@ def test_screen_picks_no_api_key_passes_through():
 def test_apply_screening_veto_removes_pick():
     picks = [_pick("AAPL"), _pick("MSFT")]
     screens = {
-        "AAPL": ScreenResult("AAPL", "VETO", "earnings tomorrow", True, True),
+        "AAPL": ScreenResult("AAPL", "VETO", "earnings tomorrow", True, True,
+                             event_risk_score=0),
         "MSFT": ScreenResult("MSFT", "CLEAR", "ok", False, True),
     }
     kept, vetoed = apply_screening(picks, screens)
@@ -49,12 +50,21 @@ def test_apply_screening_caution_halves_weight():
 def test_apply_screening_never_increases_weight():
     picks = [_pick("AAPL", weight=0.2), _pick("MSFT", weight=0.2)]
     screens = {
-        "AAPL": ScreenResult("AAPL", "VETO", "scandal", False, True),
+        "AAPL": ScreenResult("AAPL", "VETO", "scandal", False, True,
+                             leadership_score=0),
         "MSFT": ScreenResult("MSFT", "CLEAR", "ok", False, True),
     }
     kept, _ = apply_screening(picks, screens)
-    # vetoed capital stays in cash — MSFT weight unchanged
     assert kept[0].weight == pytest.approx(0.2)
+
+
+def test_screen_result_has_subscore_fields():
+    r = ScreenResult("AAPL", "CLEAR", "ok", False, True,
+                     leadership_score=3, narrative_score=2,
+                     macro_score=2, event_risk_score=3,
+                     key_risks=["some risk"])
+    assert r.leadership_score == 3
+    assert r.key_risks == ["some risk"]
 
 
 def test_apply_screening_missing_screen_defaults_clear():
