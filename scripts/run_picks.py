@@ -58,6 +58,16 @@ def parse_args() -> argparse.Namespace:
                    choices=["raw", "residual"],
                    help="'residual' ranks on market-relative prices "
                         "(residual momentum); 'raw' is the original behavior")
+    p.add_argument("--weight-mode", default=os.getenv("WEIGHT_MODE", "inv_vol"),
+                   choices=["inv_vol", "risk_parity", "equal"],
+                   help="position weighting; risk_parity is correlation-aware")
+    p.add_argument("--vol-target", type=float,
+                   default=float(os.getenv("VOL_TARGET", "0")),
+                   help="annualized vol target (e.g. 0.15); 0 disables. "
+                        "Scales exposure down, never up (no leverage)")
+    p.add_argument("--years", type=int, default=int(os.getenv("YEARS", "10")),
+                   help="years of history to load (validation strength "
+                        "grows with OOS length; Alpaca data starts 2016)")
     p.add_argument("--top-n", type=int, default=int(os.getenv("TOP_N", "10")))
     p.add_argument("--min-price", type=float, default=float(os.getenv("MIN_PRICE", "5")))
     p.add_argument("--min-adv", type=float, default=float(os.getenv("MIN_ADV", "1000000")))
@@ -97,14 +107,18 @@ def main() -> None:
           "Backtest results are optimistic.\n")
 
     # --- Load universe ---
-    logger.info("Loading universe...")
+    logger.info("Loading universe (%d years of history)...", args.years)
+    from datetime import timedelta
     from data.universe import UniverseConfig, load_universe
     uni_config = UniverseConfig(
         min_price=args.min_price,
         min_adv=args.min_adv,
         scope=args.universe,
     )
-    prices = load_universe(config=uni_config)
+    prices = load_universe(
+        config=uni_config,
+        start=today - timedelta(days=365 * args.years + 30),
+    )
     logger.info("Universe: %d tickers after liquidity filter", len(prices.universe))
 
     # --- Compute features ---
@@ -149,7 +163,8 @@ def main() -> None:
 
     if args.validate:
         logger.info("Running walk-forward backtest...")
-        bt_config = BacktestConfig(n_top=args.top_n, rebalance_freq=args.rebalance)
+        bt_config = BacktestConfig(n_top=args.top_n, rebalance_freq=args.rebalance,
+                                   weight_mode=args.weight_mode)
         bt_result = run_backtest(prices, ranker, features, bt_config)
         print(bt_result.summary())
 
@@ -188,6 +203,8 @@ def main() -> None:
     risk_config = RiskConfig(
         max_weight=args.max_weight,
         sector_cap=args.sector_cap,
+        weight_mode=args.weight_mode,
+        vol_target=args.vol_target,
     )
     sized = size_picks(ranked, prices, atr_df, risk_config)
 

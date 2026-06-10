@@ -32,8 +32,12 @@ class RiskConfig:
     total_exposure: float = 1.0        # fraction of NAV to deploy (< 1 = cash buffer)
     atr_stop_multiplier: float = 2.0   # stop = entry - N * ATR
     atr_window: int = 14
-    weight_mode: str = "inv_vol"       # "inv_vol" or "equal"
+    weight_mode: str = "inv_vol"       # "inv_vol", "risk_parity", or "equal"
     vol_window: int = 21               # days for vol estimation
+    vol_target: float = 0.0            # annualized; 0 = disabled. When set,
+                                       # total exposure is scaled down so the
+                                       # basket's trailing vol ≈ this target.
+    vol_target_lookback: int = 21
 
 
 @dataclass
@@ -63,6 +67,56 @@ def _inv_vol_weights(
         n = len(tickers)
         return {t: 1.0 / n for t in tickers}
     return (inv_vol / total).to_dict()
+
+
+def _risk_parity_weights(
+    tickers: list[str],
+    close: pd.DataFrame,
+    lookback: int = 63,
+) -> dict[str, float]:
+    """Correlation-aware weights: w_i ∝ 1 / (σ_i · Σ_j ρ_ij).
+
+    A name that is both volatile and highly correlated with the rest of the
+    basket gets less capital, so one hot sector can't dominate portfolio risk.
+    """
+    rets = close[tickers].pct_change().tail(lookback).dropna(how="all")
+    if len(rets) < 10:
+        return _inv_vol_weights(tickers, close, 21)
+    vols = rets.std()
+    corr = rets.corr().clip(lower=0)
+    corr_sum = corr.sum()
+    raw = (1.0 / (vols * corr_sum).replace(0, np.nan)).dropna()
+    total = raw.sum()
+    if total == 0 or not np.isfinite(total):
+        return _inv_vol_weights(tickers, close, 21)
+    return (raw / total).to_dict()
+
+
+def vol_target_scale(
+    weights: dict[str, float],
+    close: pd.DataFrame,
+    target: float,
+    lookback: int = 21,
+) -> float:
+    """Exposure multiplier in (0, 1] so basket trailing vol ≈ target (ann.).
+
+    Long-only, no leverage: never scales above 1.  Uses trailing realized vol
+    of the weighted basket — data through yesterday only, no look-ahead.
+    """
+    if target <= 0:
+        return 1.0
+    tickers = [t for t in weights if t in close.columns]
+    if not tickers:
+        return 1.0
+    rets = close[tickers].pct_change().tail(lookback + 1).dropna(how="all")
+    if len(rets) < 5:
+        return 1.0
+    w = pd.Series({t: weights[t] for t in tickers})
+    basket = (rets[tickers] * w).sum(axis=1)
+    realized = float(basket.std() * np.sqrt(252))
+    if not np.isfinite(realized) or realized <= 0:
+        return 1.0
+    return float(min(1.0, target / realized))
 
 
 def apply_sector_cap(
@@ -115,6 +169,8 @@ def size_picks(
     # --- initial weights ---
     if config.weight_mode == "inv_vol":
         weights = _inv_vol_weights(tickers, close, config.vol_window)
+    elif config.weight_mode == "risk_parity":
+        weights = _risk_parity_weights(tickers, close)
     else:
         n = len(tickers)
         weights = {t: 1.0 / n for t in tickers}
@@ -142,8 +198,18 @@ def size_picks(
         if all(w <= config.max_weight + 1e-9 for w in weights.values()):
             break
 
+    # --- vol targeting: shrink exposure when the basket is running hot ---
+    exposure = config.total_exposure
+    if config.vol_target > 0:
+        scale = vol_target_scale(weights, close, config.vol_target,
+                                 config.vol_target_lookback)
+        exposure *= scale
+        if scale < 1.0:
+            logger.info("Vol target %.0f%%: scaling exposure to %.0f%%",
+                        config.vol_target * 100, exposure * 100)
+
     # --- scale to total exposure ---
-    weights = {t: w * config.total_exposure for t, w in weights.items()}
+    weights = {t: w * exposure for t, w in weights.items()}
 
     # --- build SizedPick objects ---
     picks: list[SizedPick] = []
