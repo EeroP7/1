@@ -1,24 +1,29 @@
 """
-AI news analyst — screens each pick's recent news via the Claude API.
+AI analyst — full due-diligence screen for each pick.
 
-The analyst can ONLY reduce risk, never add it:
-    VETO    → drop the pick entirely (binary event imminent, scandal, earnings)
-    CAUTION → halve the position weight
-    CLEAR   → trade as the model intended
+For every pick the analyst researches four dimensions:
+  1. Leadership     — CEO/CFO stability, insider buying, credibility signals
+  2. Narrative      — is the price move backed by a real story or unexplained?
+  3. Macro/sector   — headwinds: rates, tariffs, regulation, cycle position
+  4. Event risk     — earnings, FDA, court, lock-up, M&A
 
-It never picks stocks, never increases weights, and never overrides the DSR
-gate.  Its verdicts and rationale are journaled separately from the model's
-so the overlay's value can be scored independently.
+Verdicts (can ONLY reduce risk, never add it):
+  VETO    → drop the pick entirely
+  CAUTION → halve the position weight
+  CLEAR   → trade as the model intended
 
-Requires ANTHROPIC_API_KEY in the environment.  Without it, screening is
-skipped and every pick passes through as CLEAR (flagged "unscreened").
+All scores are journaled separately from the model's signal so the overlay's
+value can be measured independently after the fact.
+
+Requires ANTHROPIC_API_KEY in the environment.  Without it, every pick passes
+through as CLEAR (flagged "unscreened").
 """
 
 from __future__ import annotations
 
 import logging
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
@@ -31,10 +36,20 @@ logger = logging.getLogger(__name__)
 MODEL_ID = "claude-opus-4-8"
 
 
-class Screening(BaseModel):
-    verdict: str          # "VETO" | "CAUTION" | "CLEAR"
-    reason: str           # one line, journaled
-    earnings_risk: bool   # earnings/binary event within ~10 days suspected
+# ---------------------------------------------------------------------------
+# Structured output schema
+# ---------------------------------------------------------------------------
+
+class DueDiligence(BaseModel):
+    verdict: str            # "VETO" | "CAUTION" | "CLEAR"
+    reason: str             # one line ≤ 20 words, goes straight into journal
+    # subscores 0–3: 0=red flag, 1=concern, 2=neutral, 3=positive
+    leadership_score: int
+    narrative_score: int
+    macro_score: int
+    event_risk_score: int   # 3=no events, 0=imminent binary event
+    earnings_within_10d: bool
+    key_risks: list[str]    # up to 3 bullet points, journaled for human review
 
 
 @dataclass
@@ -43,36 +58,62 @@ class ScreenResult:
     verdict: str
     reason: str
     earnings_risk: bool
-    screened: bool        # False = no API key / API failure, passed through
+    screened: bool
+    leadership_score: int = 2
+    narrative_score: int = 2
+    macro_score: int = 2
+    event_risk_score: int = 3
+    key_risks: list[str] = field(default_factory=list)
 
 
-SYSTEM_PROMPT = """You are a risk screener for a systematic momentum stock-picking model.
-The model has already selected its picks; your ONLY job is to flag risks the
-price-based model cannot see. You may never express bullishness or suggest
-increasing a position.
+# ---------------------------------------------------------------------------
+# System prompt
+# ---------------------------------------------------------------------------
 
-For the given stock and its recent news headlines, return:
-- verdict: "VETO" if there is an imminent binary event (earnings within ~10
-  days, pending FDA/court/regulatory decision, fraud or accounting scandal,
-  CEO departure, going-concern doubt, buyout rumor that pins the price).
-  "CAUTION" if there is elevated uncertainty that warrants half size
-  (analyst-day soon, sector-wide regulatory pressure, unresolved guidance cut).
-  "CLEAR" otherwise. Most picks should be CLEAR — do not invent concerns.
-- reason: one short sentence (max 15 words) usable in a trade journal.
-- earnings_risk: true only if you see evidence earnings are within ~10 days.
+SYSTEM_PROMPT = """You are a senior equity analyst performing rapid due diligence
+for a systematic momentum strategy. The quant model has already selected its picks
+based on price signals. Your job is to surface NON-PRICE risks the model cannot see.
 
-Be conservative with VETO — it discards real model edge. Headlines being
-merely negative is NOT a veto; momentum models buy pullbacks in strong names."""
+You will be given:
+- The ticker and company name
+- Recent news headlines and summaries (last 7 days)
+- The reason the model picked it (momentum / trend signals)
 
+Score each of four dimensions from 0–3:
+  leadership_score:  3=stable respected management, 2=neutral, 1=recent changes or concerns, 0=scandal/departure/credibility issue
+  narrative_score:   3=clear fundamental catalyst backing the move, 2=neutral, 1=move looks unexplained or crowded, 0=price move contradicts fundamentals
+  macro_score:       3=sector tailwinds, 2=neutral, 1=visible headwind (rates/tariffs/regulation), 0=severe macro headwind
+  event_risk_score:  3=no known events, 2=minor events, 1=significant event within 30d, 0=binary event within 10d (earnings/FDA/court/lockup)
+
+Then give:
+  verdict:
+    "VETO"    — event_risk_score=0 OR leadership_score=0 OR (two or more scores are 0–1 AND narrative is negative)
+    "CAUTION" — one score is 0–1 OR earnings suspected within 10–30 days
+    "CLEAR"   — everything else. Most picks should be CLEAR.
+  reason: one sentence ≤ 20 words for the trade journal.
+  earnings_within_10d: true only if you have clear evidence of earnings in next 10 days.
+  key_risks: up to 3 specific risks worth monitoring (empty list if CLEAR with no concerns).
+
+CRITICAL RULES:
+- You can ONLY reduce risk (VETO or CAUTION). You may NEVER suggest buying more.
+- Negative headlines alone are NOT a veto. Momentum buys quality names in pullbacks.
+- Be calibrated: issue VETO sparingly. A wrong VETO throws away real model edge.
+- key_risks should be specific ("CEO sold $40M shares last week"), not generic ("market risk")."""
+
+
+# ---------------------------------------------------------------------------
+# Main screening function
+# ---------------------------------------------------------------------------
 
 def screen_picks(
     news_by_ticker: "dict[str, list[NewsItem]]",
+    model_rationale: dict[str, str] | None = None,
 ) -> dict[str, ScreenResult]:
-    """Screen each ticker's news. Returns {ticker: ScreenResult}."""
+    """Full due-diligence screen for each ticker. Returns {ticker: ScreenResult}."""
     api_key = os.getenv("ANTHROPIC_API_KEY")
     if not api_key:
         logger.warning(
-            "ANTHROPIC_API_KEY not set — news screening SKIPPED. "
+            "ANTHROPIC_API_KEY not set — AI due diligence SKIPPED. "
             "All picks pass through unscreened."
         )
         return {
@@ -81,40 +122,54 @@ def screen_picks(
         }
 
     import anthropic
-
     client = anthropic.Anthropic()
     results: dict[str, ScreenResult] = {}
 
     for ticker, items in news_by_ticker.items():
-        if not items:
-            results[ticker] = ScreenResult(
-                ticker, "CLEAR", "no recent news", False, screened=True
-            )
-            continue
+        rationale = (model_rationale or {}).get(ticker, "momentum/trend signals")
 
-        headlines = "\n".join(
-            f"- [{n.created_at[:10]}] {n.headline}" + (f" — {n.summary[:200]}" if n.summary else "")
-            for n in items[:10]
+        headlines_block = ""
+        if items:
+            headlines_block = "\n".join(
+                f"- [{n.created_at[:10]}] {n.headline}"
+                + (f"\n  Summary: {n.summary[:300]}" if n.summary else "")
+                for n in items[:15]
+            )
+        else:
+            headlines_block = "(no recent news found)"
+
+        user_msg = (
+            f"Ticker: {ticker}\n"
+            f"Why the model picked it: {rationale}\n\n"
+            f"Recent news (last 7 days):\n{headlines_block}"
         )
+
         try:
             response = client.messages.parse(
                 model=MODEL_ID,
                 max_tokens=1024,
                 system=SYSTEM_PROMPT,
-                messages=[{
-                    "role": "user",
-                    "content": f"Stock: {ticker}\n\nRecent news:\n{headlines}",
-                }],
-                output_format=Screening,
+                messages=[{"role": "user", "content": user_msg}],
+                output_format=DueDiligence,
             )
-            s = response.parsed_output
-            verdict = s.verdict if s.verdict in ("VETO", "CAUTION", "CLEAR") else "CLEAR"
+            d = response.parsed_output
+            verdict = d.verdict if d.verdict in ("VETO", "CAUTION", "CLEAR") else "CLEAR"
             results[ticker] = ScreenResult(
-                ticker, verdict, s.reason, s.earnings_risk, screened=True
+                ticker=ticker,
+                verdict=verdict,
+                reason=d.reason,
+                earnings_risk=d.earnings_within_10d,
+                screened=True,
+                leadership_score=d.leadership_score,
+                narrative_score=d.narrative_score,
+                macro_score=d.macro_score,
+                event_risk_score=d.event_risk_score,
+                key_risks=d.key_risks[:3],
             )
-            logger.info("Screen %s: %s — %s", ticker, verdict, s.reason)
+            _log_result(ticker, results[ticker])
+
         except Exception as exc:
-            logger.warning("Screening failed for %s (%s) — passing through.", ticker, exc)
+            logger.warning("Due diligence failed for %s (%s) — passing through.", ticker, exc)
             results[ticker] = ScreenResult(
                 ticker, "CLEAR", f"screening error: {type(exc).__name__}", False, screened=False
             )
@@ -122,16 +177,29 @@ def screen_picks(
     return results
 
 
+def _log_result(ticker: str, r: ScreenResult) -> None:
+    scores = f"L={r.leadership_score} N={r.narrative_score} M={r.macro_score} E={r.event_risk_score}"
+    logger.info("Due diligence %s: %s [%s] — %s", ticker, r.verdict, scores, r.reason)
+    for risk in r.key_risks:
+        logger.info("  ⚠  %s: %s", ticker, risk)
+
+
+# ---------------------------------------------------------------------------
+# Apply verdicts to sized picks
+# ---------------------------------------------------------------------------
+
 def apply_screening(
-    sized_picks: list,          # list[SizedPick]
+    sized_picks: list,
     screens: dict[str, ScreenResult],
 ) -> tuple[list, list]:
     """
     Apply verdicts to sized picks.
 
-    Returns (kept_picks, vetoed_picks).  CAUTION halves the weight; VETO
-    removes the pick.  Weights are NOT renormalized upward — vetoed capital
-    stays in cash (the conservative choice).
+    VETO  → remove pick (capital stays in cash, never redistributed)
+    CAUTION → halve weight
+    CLEAR → unchanged
+
+    Returns (kept_picks, vetoed_picks).
     """
     kept, vetoed = [], []
     for pick in sized_picks:
@@ -141,6 +209,6 @@ def apply_screening(
         elif screen.verdict == "CAUTION":
             pick.weight = round(pick.weight / 2, 4)
             kept.append(pick)
-        else:  # VETO
+        else:
             vetoed.append(pick)
     return kept, vetoed

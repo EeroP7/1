@@ -36,6 +36,7 @@ PICKS_FIELDS = [
 ]
 JOURNAL_FIELDS = PICKS_FIELDS + [
     "screen_verdict", "screen_reason",
+    "dd_leadership", "dd_narrative", "dd_macro", "dd_event_risk", "dd_key_risks",
     "exit_price", "exit_date", "realized_r", "model_or_discretionary",
 ]
 
@@ -150,8 +151,18 @@ def write_picks(
     def _screen_fields(ticker: str) -> dict:
         s = (screens or {}).get(ticker)
         if s is None:
-            return {"screen_verdict": "", "screen_reason": ""}
-        return {"screen_verdict": s.verdict, "screen_reason": s.reason}
+            return {"screen_verdict": "", "screen_reason": "",
+                    "dd_leadership": "", "dd_narrative": "",
+                    "dd_macro": "", "dd_event_risk": "", "dd_key_risks": ""}
+        return {
+            "screen_verdict": s.verdict,
+            "screen_reason": s.reason,
+            "dd_leadership": getattr(s, "leadership_score", ""),
+            "dd_narrative": getattr(s, "narrative_score", ""),
+            "dd_macro": getattr(s, "macro_score", ""),
+            "dd_event_risk": getattr(s, "event_risk_score", ""),
+            "dd_key_risks": " | ".join(getattr(s, "key_risks", [])),
+        }
 
     journal_rows = [{**r, **_screen_fields(r["ticker"]),
                      "exit_price": "", "exit_date": "", "realized_r": "",
