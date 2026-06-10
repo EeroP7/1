@@ -1,0 +1,69 @@
+# Fully autonomous daily loop:
+#   ranker picks → AI news screen → paper orders → journal committed back to repo.
+#
+# Paper account ONLY — the workflow never passes --live, and --auto refuses it.
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   ALPACA_API_KEY      — Alpaca PAPER key
+#   ALPACA_SECRET_KEY   — Alpaca PAPER secret
+#   ANTHROPIC_API_KEY   — for the news screen (optional; skipped if absent)
+#
+# Schedule: 20:35 UTC = 16:35 ET (after market close), Mon–Fri.
+# Orders placed now fill at the next market open.
+
+name: Daily Picks (paper)
+
+on:
+  schedule:
+    - cron: "35 20 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (no orders)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  picks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Run tests (gate)
+        run: pytest tests/ -q
+
+      - name: Generate picks and execute (paper)
+        env:
+          ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DSR_THRESHOLD: "0.85"
+          TOP_N: "5"
+          REBALANCE_FREQ: "M"
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            python scripts/run_picks.py --validate --dry-run --news-screen \
+              --dsr-threshold "$DSR_THRESHOLD" --top-n "$TOP_N" --rebalance "$REBALANCE_FREQ"
+          else
+            python scripts/run_picks.py --auto \
+              --dsr-threshold "$DSR_THRESHOLD" --top-n "$TOP_N" --rebalance "$REBALANCE_FREQ"
+          fi
+
+      - name: Commit journal
+        run: |
+          git config user.name "pick-bot"
+          git config user.email "pick-bot@users.noreply.github.com"
+          git add -f output_data/picks.csv output_data/journal.csv || true
+          git diff --cached --quiet || git commit -m "journal: daily picks $(date -u +%F)"
+          git push
