@@ -54,6 +54,10 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--universe", default=os.getenv("UNIVERSE", "sp500"),
                    choices=["sp500", "all"],
                    help="'sp500' (default) or 'all' liquid US equities on Alpaca")
+    p.add_argument("--features", default=os.getenv("FEATURES", "raw"),
+                   choices=["raw", "residual"],
+                   help="'residual' ranks on market-relative prices "
+                        "(residual momentum); 'raw' is the original behavior")
     p.add_argument("--top-n", type=int, default=int(os.getenv("TOP_N", "10")))
     p.add_argument("--min-price", type=float, default=float(os.getenv("MIN_PRICE", "5")))
     p.add_argument("--min-adv", type=float, default=float(os.getenv("MIN_ADV", "1000000")))
@@ -104,11 +108,24 @@ def main() -> None:
     logger.info("Universe: %d tickers after liquidity filter", len(prices.universe))
 
     # --- Compute features ---
-    logger.info("Computing features...")
+    logger.info("Computing features (%s)...", args.features)
     import pandas as pd
     from features.library import compute_features, atr
 
-    features = compute_features(prices, normalize=True)
+    if args.features == "residual":
+        # residual momentum: features from market-relative prices, so the
+        # ranker rewards stock-specific strength instead of sector beta
+        from copy import copy
+        close_idx = prices.close
+        index_level = (1 + close_idx.pct_change().mean(axis=1)).cumprod()
+        rel = copy(prices)
+        rel.open = prices.open.div(index_level, axis=0)
+        rel.high = prices.high.div(index_level, axis=0)
+        rel.low = prices.low.div(index_level, axis=0)
+        rel.close = prices.close.div(index_level, axis=0)
+        features = compute_features(rel, normalize=True)
+    else:
+        features = compute_features(prices, normalize=True)
     # Drop dates with mostly NaN (initial feature warmup period)
     count_series = [df.count(axis=1) for df in features.values()]
     min_valid = count_series[0].copy()

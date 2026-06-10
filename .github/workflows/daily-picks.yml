@@ -52,6 +52,9 @@ jobs:
           TOP_N: "5"
           REBALANCE_FREQ: "M"
           UNIVERSE: "all"
+          # residual momentum: +29.4% vs +3.7% baseline over 5y OOS (see
+          # experiments/compare_strategies.py); DSR gate still applies each run
+          FEATURES: "residual"
           # broader universe → stricter liquidity floor ($5M/day) to keep fills realistic
           MIN_ADV: "5000000"
         run: |
