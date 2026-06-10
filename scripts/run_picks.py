@@ -59,7 +59,20 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--dsr-threshold", type=float, default=float(os.getenv("DSR_THRESHOLD", "0.95")))
     p.add_argument("--rebalance", default=os.getenv("REBALANCE_FREQ", "W"),
                    choices=["D", "W", "M", "ME"])
-    return p.parse_args()
+    p.add_argument("--news-screen", action="store_true",
+                   help="Screen picks against recent news via Claude (veto/halve only)")
+    p.add_argument("--auto", action="store_true",
+                   help="Fully autonomous daily run: --validate --execute --news-screen, "
+                        "non-interactive, paper account only")
+    args = p.parse_args()
+    if args.auto:
+        if args.live:
+            p.error("--auto is paper-only; it cannot be combined with --live.")
+        args.validate = True
+        args.execute = True
+        args.news_screen = True
+        args.dry_run = False
+    return args
 
 
 def main() -> None:
@@ -157,6 +170,24 @@ def main() -> None:
     )
     sized = size_picks(ranked, prices, atr_df, risk_config)
 
+    # --- AI news screen (veto / halve only — never adds risk) ---
+    screens = {}
+    if args.news_screen:
+        from news.scanner import fetch_news
+        from news.analyst import screen_picks, apply_screening
+
+        logger.info("Screening picks against recent news...")
+        news = fetch_news([p.ticker for p in sized])
+        screens = screen_picks(news)
+        sized, vetoed = apply_screening(sized, screens)
+        for v in vetoed:
+            s = screens[v.ticker]
+            print(f"  ⛔ VETOED {v.ticker}: {s.reason}")
+        for p in sized:
+            s = screens.get(p.ticker)
+            if s and s.verdict == "CAUTION":
+                print(f"  ⚠️  CAUTION {p.ticker} (weight halved): {s.reason}")
+
     # --- Feature rows for rationale ---
     feature_rows = {}
     for ticker in [p.ticker for p in sized]:
@@ -172,7 +203,7 @@ def main() -> None:
     print_picks(sized, as_of=today, feature_rows=feature_rows)
 
     if args.dry_run or not args.execute:
-        write_picks(sized, as_of=today, feature_rows=feature_rows)
+        write_picks(sized, as_of=today, feature_rows=feature_rows, screens=screens)
         send_alert(sized, as_of=today)
         print(f"\n[DRY RUN] Picks written to output_data/. No orders placed.\n")
         return
@@ -197,7 +228,7 @@ def main() -> None:
     if errors:
         logger.warning("%d orders failed: %s", len(errors), [r.ticker for r in errors])
 
-    write_picks(sized, as_of=today, feature_rows=feature_rows)
+    write_picks(sized, as_of=today, feature_rows=feature_rows, screens=screens)
     send_alert(sized, as_of=today)
     print(f"\n✅ Placed {len(results) - len(errors)}/{len(results)} orders in "
           f"{'LIVE' if args.live else 'PAPER'} account.\n")

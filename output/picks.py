@@ -35,6 +35,7 @@ PICKS_FIELDS = [
     "atr", "weight", "sector", "earnings_flag", "rationale",
 ]
 JOURNAL_FIELDS = PICKS_FIELDS + [
+    "screen_verdict", "screen_reason",
     "exit_price", "exit_date", "realized_r", "model_or_discretionary",
 ]
 
@@ -119,6 +120,7 @@ def write_picks(
     as_of: date | None = None,
     feature_rows: dict | None = None,
     model: str = "model",
+    screens: dict | None = None,
 ) -> None:
     """Append picks to picks.csv and journal.csv."""
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -145,7 +147,15 @@ def write_picks(
 
     _append_csv(PICKS_CSV, PICKS_FIELDS, rows)
 
-    journal_rows = [{**r, "exit_price": "", "exit_date": "", "realized_r": "", "model_or_discretionary": model}
+    def _screen_fields(ticker: str) -> dict:
+        s = (screens or {}).get(ticker)
+        if s is None:
+            return {"screen_verdict": "", "screen_reason": ""}
+        return {"screen_verdict": s.verdict, "screen_reason": s.reason}
+
+    journal_rows = [{**r, **_screen_fields(r["ticker"]),
+                     "exit_price": "", "exit_date": "", "realized_r": "",
+                     "model_or_discretionary": model}
                     for r in rows]
     _append_csv(JOURNAL_CSV, JOURNAL_FIELDS, journal_rows)
     logger.info("Wrote %d picks to %s and %s", len(picks), PICKS_CSV, JOURNAL_CSV)
