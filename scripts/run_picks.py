@@ -93,8 +93,12 @@ def main() -> None:
 
     features = compute_features(prices, normalize=True)
     # Drop dates with mostly NaN (initial feature warmup period)
-    min_valid = min(df.count(axis=1) for df in features.values())
-    valid_dates = min_valid[min_valid > len(prices.universe) * 0.5].index
+    count_series = [df.count(axis=1) for df in features.values()]
+    min_valid = count_series[0].copy()
+    for s in count_series[1:]:
+        min_valid = min_valid.where(min_valid <= s, s)
+    threshold = len(prices.universe) * 0.5
+    valid_dates = min_valid[min_valid > threshold].index
     features = {k: v.loc[valid_dates] for k, v in features.items()}
     logger.info("Feature dates: %s to %s", valid_dates[0], valid_dates[-1])
 
