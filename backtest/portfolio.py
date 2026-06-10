@@ -98,6 +98,28 @@ def _inv_vol_weights(
     return (inv / total).to_dict()
 
 
+def _risk_parity_weights(
+    tickers: list[str], close: pd.DataFrame, lookback: int = 63
+) -> dict[str, float]:
+    """Correlation-aware weights: w_i ∝ 1 / (σ_i · Σ_j ρ_ij).
+
+    A name that is both volatile and highly correlated with the rest of the
+    basket gets less capital, so one hot sector can't dominate portfolio risk.
+    """
+    rets = close[tickers].pct_change().tail(lookback).dropna(how="all")
+    if len(rets) < 10:
+        return _inv_vol_weights(tickers, close, 21)
+    vols = rets.std()
+    corr = rets.corr().clip(lower=0)  # negative corr shouldn't inflate weight unboundedly
+    corr_sum = corr.sum()             # Σ_j ρ_ij (includes ρ_ii = 1)
+    raw = 1.0 / (vols * corr_sum).replace(0, np.nan)
+    raw = raw.dropna()
+    total = raw.sum()
+    if total == 0 or not np.isfinite(total):
+        return _inv_vol_weights(tickers, close, 21)
+    return (raw / total).to_dict()
+
+
 def _portfolio_return(
     weights: dict[str, float],
     returns_row: pd.Series,
@@ -236,6 +258,8 @@ def _simulate_oos(
 
             if config.weight_mode == "inv_vol":
                 new_weights = _inv_vol_weights(tickers, close.loc[:date], config.vol_window)
+            elif config.weight_mode == "risk_parity":
+                new_weights = _risk_parity_weights(tickers, close.loc[:date])
             else:
                 new_weights = _equal_weights(tickers)
 
