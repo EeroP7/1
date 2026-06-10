@@ -60,11 +60,56 @@ def get_account(live: bool = False) -> dict:
     }
 
 
+def get_positions(live: bool = False) -> dict[str, float]:
+    """Current open positions as {symbol: market_value_usd}."""
+    client = _get_client(live)
+    return {p.symbol: float(p.market_value) for p in client.get_all_positions()}
+
+
+def rotate_out(
+    picks: "list[SizedPick]",
+    dry_run: bool = True,
+    live: bool = False,
+) -> list[str]:
+    """Close every open position whose symbol is not in the pick list.
+
+    Returns the list of symbols closed. Sells are submitted before buys so the
+    freed capital funds the new basket at the next open.
+    """
+    if live:
+        _confirm_live_trading()
+
+    keep = {p.ticker for p in picks}
+    try:
+        positions = get_positions(live)
+    except Exception as exc:
+        logger.error("Could not fetch positions for rotation: %s", exc)
+        return []
+
+    closed: list[str] = []
+    for symbol, mv in positions.items():
+        if symbol in keep:
+            continue
+        if dry_run:
+            logger.info("[DRY RUN] Would SELL %s (market value $%.2f)", symbol, mv)
+            closed.append(symbol)
+            continue
+        try:
+            client = _get_client(live)
+            client.close_position(symbol)
+            logger.info("Closed position %s (market value $%.2f)", symbol, mv)
+            closed.append(symbol)
+        except Exception as exc:
+            logger.error("Failed to close %s: %s", symbol, exc)
+    return closed
+
+
 def place_basket(
     picks: "list[SizedPick]",
     portfolio_value: float,
     dry_run: bool = True,
     live: bool = False,
+    current_positions: dict[str, float] | None = None,
 ) -> list[OrderResult]:
     """
     Place fractional notional orders for each pick.
@@ -75,27 +120,32 @@ def place_basket(
     portfolio_value : total account equity in USD
     dry_run : if True, compute orders but do NOT submit
     live : if True, use live account (requires separate confirmation prompt)
+    current_positions : {symbol: market_value} of holdings; when given, only
+        the difference between target and held value is traded (delta orders)
     """
     if live:
         _confirm_live_trading()
 
-    from alpaca.trading.client import TradingClient
     from alpaca.trading.requests import MarketOrderRequest
     from alpaca.trading.enums import OrderSide, TimeInForce
 
     client = _get_client(live) if not dry_run else None
+    held = current_positions or {}
 
     results: list[OrderResult] = []
     for pick in picks:
-        notional = round(pick.weight * portfolio_value, 2)
-        if notional < 1.0:
-            logger.debug("Skipping %s: notional %.2f < $1", pick.ticker, notional)
+        target = round(pick.weight * portfolio_value, 2)
+        delta = round(target - held.get(pick.ticker, 0.0), 2)
+        if abs(delta) < 1.0:
+            logger.debug("Skipping %s: delta %.2f < $1", pick.ticker, delta)
             continue
+        side = OrderSide.BUY if delta > 0 else OrderSide.SELL
+        notional = abs(delta)
 
         if dry_run:
             logger.info(
-                "[DRY RUN] Would BUY %s notional=$%.2f (weight=%.1f%%)",
-                pick.ticker, notional, pick.weight * 100,
+                "[DRY RUN] Would %s %s notional=$%.2f (target weight=%.1f%%)",
+                side.name, pick.ticker, notional, pick.weight * 100,
             )
             results.append(OrderResult(
                 ticker=pick.ticker,
@@ -103,14 +153,14 @@ def place_basket(
                 status="simulated",
                 qty=0,
                 notional=notional,
-                side="buy",
+                side=side.name.lower(),
             ))
         else:
             try:
                 req = MarketOrderRequest(
                     symbol=pick.ticker,
                     notional=notional,
-                    side=OrderSide.BUY,
+                    side=side,
                     time_in_force=TimeInForce.DAY,
                 )
                 order = client.submit_order(req)
@@ -120,11 +170,11 @@ def place_basket(
                     status=str(order.status),
                     qty=float(order.qty or 0),
                     notional=notional,
-                    side="buy",
+                    side=side.name.lower(),
                 ))
                 logger.info(
-                    "Placed order %s for %s notional=$%.2f",
-                    order.id, pick.ticker, notional,
+                    "Placed %s order %s for %s notional=$%.2f",
+                    side.name, order.id, pick.ticker, notional,
                 )
             except Exception as exc:
                 logger.error("Order failed for %s: %s", pick.ticker, exc)
@@ -134,7 +184,7 @@ def place_basket(
                     status="error",
                     qty=0,
                     notional=notional,
-                    side="buy",
+                    side=side.name.lower(),
                     error=str(exc),
                 ))
 

@@ -217,16 +217,28 @@ def main() -> None:
         logger.error("Ranker not validated. Run with --validate first.")
         sys.exit(1)
 
-    from execution.alpaca_paper import get_account, place_basket
+    from execution.alpaca_paper import get_account, get_positions, place_basket, rotate_out
 
     acct = get_account(live=args.live)
     logger.info("Account equity: $%.2f", acct["equity"])
+
+    # sell names that dropped out of the pick list, then trade only the
+    # difference between target and held value for the rest
+    closed = rotate_out(sized, dry_run=False, live=args.live)
+    if closed:
+        logger.info("Rotated out of %d positions: %s", len(closed), closed)
+    try:
+        positions = get_positions(live=args.live)
+    except Exception as exc:
+        logger.warning("Could not fetch positions, placing full-size orders: %s", exc)
+        positions = {}
 
     results = place_basket(
         picks=sized,
         portfolio_value=acct["equity"],
         dry_run=False,
         live=args.live,
+        current_positions=positions,
     )
     errors = [r for r in results if r.error]
     if errors:
