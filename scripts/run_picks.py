@@ -65,6 +65,10 @@ def parse_args() -> argparse.Namespace:
                    default=float(os.getenv("VOL_TARGET", "0")),
                    help="annualized vol target (e.g. 0.15); 0 disables. "
                         "Scales exposure down, never up (no leverage)")
+    p.add_argument("--regime-filter", action="store_true",
+                   default=os.getenv("REGIME_FILTER", "") == "1",
+                   help="hold cash when the universe index is below its "
+                        "200-day average (crisis protection)")
     p.add_argument("--years", type=int, default=int(os.getenv("YEARS", "10")),
                    help="years of history to load (validation strength "
                         "grows with OOS length; Alpaca data starts 2016)")
@@ -198,7 +202,7 @@ def main() -> None:
     logger.info("Top picks: %s", [t for t, _ in ranked])
 
     # --- Size picks ---
-    from risk.sizing import RiskConfig, size_picks
+    from risk.sizing import RiskConfig, market_regime_on, size_picks
 
     risk_config = RiskConfig(
         max_weight=args.max_weight,
@@ -206,6 +210,15 @@ def main() -> None:
         weight_mode=args.weight_mode,
         vol_target=args.vol_target,
     )
+
+    # --- Regime filter: below the 200d MA the system holds cash ---
+    if args.regime_filter and not market_regime_on(prices.close):
+        logger.warning(
+            "REGIME RISK-OFF: universe index below 200d MA. "
+            "Target exposure set to 0 — existing positions will be sold."
+        )
+        risk_config.total_exposure = 0.0
+
     sized = size_picks(ranked, prices, atr_df, risk_config)
 
     # --- AI news screen (veto / halve only — never adds risk) ---

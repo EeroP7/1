@@ -75,13 +75,47 @@ def regime_overlay(returns: pd.Series, index_level: pd.Series) -> pd.Series:
     return returns.where(risk_on, 0.0)
 
 
+def _load_from_yahoo(start: date, end: date) -> "PriceData":
+    """20y+ history via Yahoo Finance (Alpaca only goes back to 2016).
+
+    ⚠️  Survivorship bias is WORSE at long horizons: the current S&P list
+    contains none of the names that died in 2008 etc.  Results are even
+    more optimistic than usual.
+    """
+    import yfinance as yf
+    from data.universe import _SP500_TICKERS, PriceData
+
+    tickers = [t.replace(".", "-") for t in _SP500_TICKERS]  # BRK.B → BRK-B
+    df = yf.download(tickers, start=start.isoformat(), end=end.isoformat(),
+                     progress=False, auto_adjust=True, group_by="column")
+
+    def _field(name: str) -> pd.DataFrame:
+        out = df[name].copy()
+        out.columns = [c.replace("-", ".") for c in out.columns]
+        return out
+
+    close = _field("Close")
+    # drop tickers with <60% coverage to avoid all-NaN columns from delistings
+    keep = close.columns[close.notna().mean() > 0.6]
+    prices = PriceData(
+        open=_field("Open")[keep], high=_field("High")[keep],
+        low=_field("Low")[keep], close=close[keep],
+        volume=_field("Volume")[keep],
+        universe=list(keep), config=UniverseConfig(),
+    )
+    return prices
+
+
 def main() -> None:
     print(SURVIVORSHIP_WARNING, "\n")
     end = date.today()
     years = int(os.getenv("YEARS", "5"))
     start = end - timedelta(days=365 * years + 30)
 
-    prices = load_universe(config=UniverseConfig(), start=start, end=end)
+    if os.getenv("DATA_SOURCE", "alpaca") == "yahoo":
+        prices = _load_from_yahoo(start, end)
+    else:
+        prices = load_universe(config=UniverseConfig(), start=start, end=end)
     print(f"Universe: {len(prices.universe)} tickers, "
           f"{len(prices.close)} days ({prices.close.index[0]} → {prices.close.index[-1]})")
 
