@@ -108,6 +108,33 @@ def test_size_picks_risk_parity_mode(prices):
     assert 0 < total <= 1.0 + 1e-6
 
 
+def test_market_regime_on_in_uptrend():
+    from risk.sizing import market_regime_on
+    import pandas as pd, numpy as np
+    dates = pd.bdate_range("2020-01-01", periods=300)
+    close = pd.DataFrame({"A": np.linspace(100, 200, 300),
+                          "B": np.linspace(50, 100, 300)}, index=dates)
+    assert market_regime_on(close) is True
+
+
+def test_market_regime_off_in_downtrend():
+    from risk.sizing import market_regime_on
+    import pandas as pd, numpy as np
+    dates = pd.bdate_range("2020-01-01", periods=300)
+    close = pd.DataFrame({"A": np.linspace(200, 100, 300),
+                          "B": np.linspace(100, 50, 300)}, index=dates)
+    assert market_regime_on(close) is False
+
+
+def test_market_regime_defaults_on_with_short_history():
+    from risk.sizing import market_regime_on
+    import pandas as pd
+    import numpy as np
+    dates = pd.bdate_range("2020-01-01", periods=50)
+    close = pd.DataFrame({"A": np.linspace(200, 100, 50)}, index=dates)
+    assert market_regime_on(close) is True
+
+
 def test_universe_config_scope_default_sp500():
     from data.universe import UniverseConfig
     assert UniverseConfig().scope == "sp500"

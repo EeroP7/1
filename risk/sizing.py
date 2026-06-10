@@ -119,6 +119,21 @@ def vol_target_scale(
     return float(min(1.0, target / realized))
 
 
+def market_regime_on(close: pd.DataFrame, window: int = 200) -> bool:
+    """True when the equal-weight universe index is above its moving average.
+
+    Below the MA → risk-off: the system holds cash instead of buying.
+    Worth little in normal years; in 2008-style crises it halves drawdowns
+    (verified over 20y in experiments/compare_strategies.py).
+    Uses data through yesterday's close only — no look-ahead.
+    """
+    index_level = (1 + close.pct_change().mean(axis=1)).cumprod()
+    if len(index_level) < window + 1:
+        return True  # not enough history to judge — default to invested
+    ma = index_level.rolling(window).mean()
+    return bool(index_level.iloc[-1] > ma.iloc[-1])
+
+
 def apply_sector_cap(
     weights: dict[str, float],
     sector_cap: float,

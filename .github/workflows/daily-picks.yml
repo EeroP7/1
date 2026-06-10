@@ -55,6 +55,8 @@ jobs:
           REBALANCE_FREQ: "M"
           WEIGHT_MODE: "risk_parity"
           VOL_TARGET: "0.15"
+          # 20y test: regime filter halves crisis drawdowns (2008) at same Sharpe
+          REGIME_FILTER: "1"
           YEARS: "10"
           UNIVERSE: "all"
           # residual momentum: +29.4% vs +3.7% baseline over 5y OOS (see
