@@ -14,6 +14,7 @@ Variants (all walk-forward, costs charged, no look-ahead):
 
 from __future__ import annotations
 
+import os
 import sys
 from copy import copy
 from datetime import date, timedelta
@@ -77,7 +78,8 @@ def regime_overlay(returns: pd.Series, index_level: pd.Series) -> pd.Series:
 def main() -> None:
     print(SURVIVORSHIP_WARNING, "\n")
     end = date.today()
-    start = end - timedelta(days=365 * 5 + 30)
+    years = int(os.getenv("YEARS", "5"))
+    start = end - timedelta(days=365 * years + 30)
 
     prices = load_universe(config=UniverseConfig(), start=start, end=end)
     print(f"Universe: {len(prices.universe)} tickers, "

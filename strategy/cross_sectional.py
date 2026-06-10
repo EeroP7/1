@@ -29,10 +29,21 @@ class RankerConfig:
     n_top: int = 10                 # long picks per day
     n_bottom: int = 0               # short picks (stocks only = 0)
     feature_weights: dict[str, float] = field(default_factory=dict)
-    n_trials: int = 1               # number of param combinations explored (for DSR)
     ic_lookback: int = 63           # days used to estimate IC in-sample
     validated: bool = False
     dsr_threshold: float = 0.95
+
+    @property
+    def n_trials(self) -> int:
+        """Always returns the true count of strategy variants ever explored.
+
+        Hard-coding n_trials=1 in the config was methodologically wrong:
+        the DSR must be told the real number of strategies tried so it can
+        correctly penalise selection bias.  The trial_counter module is the
+        single source of truth.
+        """
+        from validation.trial_counter import n_trials
+        return n_trials()
 
 
 class CrossSectionalRanker:

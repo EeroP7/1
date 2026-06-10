@@ -65,6 +65,49 @@ def test_sector_cap_unknown_sector_exempt():
     assert capped == pytest.approx(weights)
 
 
+def test_risk_parity_weights_sum_to_one(prices):
+    from risk.sizing import _risk_parity_weights
+    tickers = prices.universe[:5]
+    w = _risk_parity_weights(tickers, prices.close)
+    assert abs(sum(w.values()) - 1.0) < 1e-9
+    assert all(v > 0 for v in w.values())
+
+
+def test_vol_target_scale_never_exceeds_one(prices):
+    from risk.sizing import vol_target_scale
+    tickers = prices.universe[:5]
+    weights = {t: 0.2 for t in tickers}
+    scale = vol_target_scale(weights, prices.close, target=10.0)  # absurdly high target
+    assert scale <= 1.0  # long-only: never levers up
+
+
+def test_vol_target_scale_reduces_for_low_target(prices):
+    from risk.sizing import vol_target_scale
+    tickers = prices.universe[:5]
+    weights = {t: 0.2 for t in tickers}
+    scale = vol_target_scale(weights, prices.close, target=0.01)  # 1% ann vol
+    assert 0.0 < scale < 1.0
+
+
+def test_vol_target_disabled_returns_full_exposure(prices):
+    from risk.sizing import vol_target_scale
+    weights = {t: 0.2 for t in prices.universe[:5]}
+    assert vol_target_scale(weights, prices.close, target=0.0) == 1.0
+
+
+def test_size_picks_risk_parity_mode(prices):
+    from features.library import atr
+    import pandas as pd
+    atr_df = atr(prices)
+    if not isinstance(atr_df.index, pd.DatetimeIndex):
+        atr_df.index = pd.to_datetime(atr_df.index)
+    ranked = [(t, 1.0) for t in prices.universe[:5]]
+    config = RiskConfig(weight_mode="risk_parity", vol_target=0.15)
+    picks = size_picks(ranked, prices, atr_df, config)
+    total = sum(p.weight for p in picks)
+    assert 0 < total <= 1.0 + 1e-6
+
+
 def test_universe_config_scope_default_sp500():
     from data.universe import UniverseConfig
     assert UniverseConfig().scope == "sp500"
