@@ -47,6 +47,29 @@ def test_size_picks_stop_below_entry(prices):
             assert p.stop < p.entry_ref
 
 
+def test_sector_cap_caps_known_sectors():
+    from risk.sizing import apply_sector_cap
+    weights = {"A": 0.25, "B": 0.25, "C": 0.25, "D": 0.25}
+    sectors = {"A": "Tech", "B": "Tech", "C": "Tech", "D": "Energy"}
+    capped = apply_sector_cap(weights, 0.30, lambda t: sectors[t])
+    assert abs(sum(capped.values()) - 1.0) < 1e-9
+    tech_total = capped["A"] + capped["B"] + capped["C"]
+    assert tech_total < 0.75  # was 0.75 before cap; must be scaled down
+
+
+def test_sector_cap_unknown_sector_exempt():
+    from risk.sizing import apply_sector_cap
+    # All tickers unmapped → sector "Unknown" → no cap applied, weights unchanged
+    weights = {"ZZZA": 0.4, "ZZZB": 0.6}
+    capped = apply_sector_cap(weights, 0.30, lambda t: "Unknown")
+    assert capped == pytest.approx(weights)
+
+
+def test_universe_config_scope_default_sp500():
+    from data.universe import UniverseConfig
+    assert UniverseConfig().scope == "sp500"
+
+
 def test_size_picks_rank_order(prices):
     from features.library import atr
     atr_df = atr(prices)

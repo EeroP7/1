@@ -150,6 +150,7 @@ class UniverseConfig:
     adv_lookback: int = 20            # trading days for ADV calculation
     tickers: list[str] = field(default_factory=list)
     point_in_time: bool = False       # always False for this static list
+    scope: str = "sp500"              # "sp500" or "all" (all active US equities on Alpaca)
 
 
 @dataclass
@@ -184,9 +185,6 @@ def load_universe(
     if config is None:
         config = UniverseConfig()
 
-    if not config.tickers:
-        config.tickers = list(_SP500_TICKERS)
-
     end = end or date.today()
     # need extra history for momentum features (252 days lookback)
     start = start or (end - timedelta(days=365 * 3))
@@ -199,6 +197,18 @@ def load_universe(
     api_key = os.getenv("ALPACA_API_KEY")
     secret_key = os.getenv("ALPACA_SECRET_KEY")
 
+    if not config.tickers:
+        if config.scope == "all" and api_key and secret_key:
+            config.tickers = _list_all_us_equities(api_key, secret_key)
+            logger.info("Universe scope 'all': %d active US equities", len(config.tickers))
+        else:
+            if config.scope == "all":
+                logger.warning(
+                    "Universe scope 'all' requires Alpaca credentials; "
+                    "falling back to S&P 500 list."
+                )
+            config.tickers = list(_SP500_TICKERS)
+
     if api_key and secret_key:
         return _load_from_alpaca(config, start, end, api_key, secret_key)
     else:
@@ -207,6 +217,37 @@ def load_universe(
             "Using synthetic data. Set credentials in .env for real data."
         )
         return _make_synthetic(config, start, end)
+
+
+_EXCHANGES_OK = {"NYSE", "NASDAQ", "AMEX", "ARCA", "BATS"}
+
+
+def _list_all_us_equities(api_key: str, secret_key: str) -> list[str]:
+    """All active, tradable US equities on major exchanges (no OTC).
+
+    Liquidity filtering (min price / min ADV) happens later, after bars load.
+    """
+    from alpaca.trading.client import TradingClient
+    from alpaca.trading.requests import GetAssetsRequest
+    from alpaca.trading.enums import AssetClass, AssetStatus
+
+    client = TradingClient(api_key, secret_key, paper=True)
+    assets = client.get_all_assets(
+        GetAssetsRequest(status=AssetStatus.ACTIVE, asset_class=AssetClass.US_EQUITY)
+    )
+    # stocks only — exclude ETFs/funds/trusts by name (Alpaca has no asset-type flag)
+    _fund_words = ("etf", " fund", "trust", "ishares", "spdr", "proshares",
+                   "vanguard", "index", " shares", "etn ", " etn")
+    tickers = sorted(
+        a.symbol for a in assets
+        if a.tradable
+        and str(a.exchange).split(".")[-1] in _EXCHANGES_OK
+        # skip warrants/units/preferred-style suffixed symbols
+        and a.symbol.replace(".", "").isalpha()
+        and len(a.symbol) <= 5
+        and not any(w in (a.name or "").lower() for w in _fund_words)
+    )
+    return tickers
 
 
 def _load_from_alpaca(
@@ -237,10 +278,17 @@ def _load_from_alpaca(
             end=datetime.combine(end, datetime.min.time()).replace(tzinfo=timezone.utc),
             adjustment=Adjustment.ALL,
         )
-        bars = client.get_stock_bars(req).df
-        all_bars.append(bars)
+        try:
+            bars = client.get_stock_bars(req).df
+        except Exception as exc:
+            logger.warning("Batch %d-%d failed, skipping: %s", i, i + len(batch), exc)
+            continue
+        if not bars.empty:
+            all_bars.append(bars)
         logger.debug("Loaded %d tickers (%d/%d)", len(batch), i + len(batch), len(tickers))
 
+    if not all_bars:
+        raise RuntimeError("No price data returned from Alpaca for any ticker batch.")
     df = pd.concat(all_bars)
     df.index.names = ["ticker", "timestamp"]
     df = df.reset_index()

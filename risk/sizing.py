@@ -70,19 +70,23 @@ def apply_sector_cap(
     sector_cap: float,
     get_sector_fn,
 ) -> dict[str, float]:
-    """Scale down sectors exceeding the cap, redistribute proportionally."""
+    """Scale down sectors exceeding the cap, redistribute proportionally.
+
+    Tickers with sector "Unknown" (not in the sector map) are exempt from the
+    cap — they aren't a real sector, so lumping them into one capped bucket
+    would wrongly squeeze broad-universe portfolios.
+    """
     sector_total: dict[str, float] = {}
     for ticker, w in weights.items():
         s = get_sector_fn(ticker)
         sector_total[s] = sector_total.get(s, 0) + w
 
     scale: dict[str, float] = {
-        s: min(1.0, sector_cap / total) if total > 0 else 1.0
+        s: 1.0 if s == "Unknown" or total <= 0 else min(1.0, sector_cap / total)
         for s, total in sector_total.items()
     }
 
-    from data.universe import get_sector
-    scaled = {t: w * scale[get_sector(t)] for t, w in weights.items()}
+    scaled = {t: w * scale[get_sector_fn(t)] for t, w in weights.items()}
     total = sum(scaled.values())
     return {t: w / total for t, w in scaled.items()} if total > 0 else scaled
 
