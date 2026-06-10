@@ -115,14 +115,22 @@ def main() -> None:
     res = run_backtest(prices, ranker_res, rel_features, bt_config)
     res_r = res.oos_returns
 
-    combined = regime_overlay(vol_target_overlay(res_r), index_level)
+    # --- residual momentum + risk-parity (correlation-aware) weighting ---
+    rp_config = BacktestConfig(n_top=TOP_N, rebalance_freq=REBALANCE,
+                               weight_mode="risk_parity")
+    ranker_rp = CrossSectionalRanker(RankerConfig(n_top=TOP_N))
+    res_rp = run_backtest(prices, ranker_rp, rel_features, rp_config)
+    res_rp_r = res_rp.oos_returns
 
     rows = [
         _stats(base_r, "baseline (current production)"),
-        _stats(vol_target_overlay(base_r), "vol targeting (15% ann.)"),
-        _stats(regime_overlay(base_r, index_level), "regime filter (200d MA)"),
         _stats(res_r, "residual momentum"),
-        _stats(combined, "combined (all three)"),
+        _stats(res_rp_r, "residual + risk parity"),
+        _stats(vol_target_overlay(res_r), "residual + vol target"),
+        _stats(regime_overlay(res_r, index_level), "residual + regime filter"),
+        _stats(vol_target_overlay(res_rp_r), "residual + risk parity + vol target"),
+        _stats(regime_overlay(vol_target_overlay(res_rp_r), index_level),
+               "residual + risk parity + vol target + regime"),
     ]
     out = pd.DataFrame(rows)
     print("\n", out.to_string(index=False))
