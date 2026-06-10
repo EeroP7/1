@@ -51,6 +51,9 @@ def parse_args() -> argparse.Namespace:
                    help="Close all open positions immediately")
     p.add_argument("--live", action="store_true",
                    help="⚠️  Use live Alpaca account (requires confirmation)")
+    p.add_argument("--universe", default=os.getenv("UNIVERSE", "sp500"),
+                   choices=["sp500", "all"],
+                   help="'sp500' (default) or 'all' liquid US equities on Alpaca")
     p.add_argument("--top-n", type=int, default=int(os.getenv("TOP_N", "10")))
     p.add_argument("--min-price", type=float, default=float(os.getenv("MIN_PRICE", "5")))
     p.add_argument("--min-adv", type=float, default=float(os.getenv("MIN_ADV", "1000000")))
@@ -95,6 +98,7 @@ def main() -> None:
     uni_config = UniverseConfig(
         min_price=args.min_price,
         min_adv=args.min_adv,
+        scope=args.universe,
     )
     prices = load_universe(config=uni_config)
     logger.info("Universe: %d tickers after liquidity filter", len(prices.universe))

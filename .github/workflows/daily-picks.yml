@@ -29,7 +29,7 @@ permissions:
 jobs:
   picks:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 90   # broad universe: data load + walk-forward takes longer
     steps:
       - uses: actions/checkout@v4
 
@@ -51,6 +51,9 @@ jobs:
           DSR_THRESHOLD: "0.85"
           TOP_N: "5"
           REBALANCE_FREQ: "M"
+          UNIVERSE: "all"
+          # broader universe → stricter liquidity floor ($5M/day) to keep fills realistic
+          MIN_ADV: "5000000"
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             python scripts/run_picks.py --validate --dry-run --news-screen \
