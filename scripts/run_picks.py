@@ -58,7 +58,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--sector-cap", type=float, default=float(os.getenv("SECTOR_CAP", "0.30")))
     p.add_argument("--dsr-threshold", type=float, default=float(os.getenv("DSR_THRESHOLD", "0.95")))
     p.add_argument("--rebalance", default=os.getenv("REBALANCE_FREQ", "W"),
-                   choices=["D", "W", "M"])
+                   choices=["D", "W", "M", "ME"])
     return p.parse_args()
 
 

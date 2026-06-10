@@ -76,6 +76,7 @@ class BacktestResult:
 def _rebalance_dates(index: pd.DatetimeIndex, freq: str) -> pd.DatetimeIndex:
     """Return dates in `index` that fall on rebalance boundaries."""
     dummy = pd.Series(1, index=index)
+    freq = "ME" if freq == "M" else freq
     resampled = dummy.resample(freq).last()
     return resampled.index.intersection(index)
 
