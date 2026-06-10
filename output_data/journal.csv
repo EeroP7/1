@@ -1,0 +1,6 @@
+date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale,screen_verdict,screen_reason,exit_price,exit_date,realized_r,model_or_discretionary
+2026-06-10,MU,1,2.5815,935.89,778.95,78.47,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),,,,model
+2026-06-10,INTC,2,2.5199,107.92,89.44,9.24,0.2,Technology,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),,,,model
+2026-06-10,AMD,3,2.3799,475.5,407.34,34.08,0.2,Technology,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),,,,model
+2026-06-10,GLW,4,2.3101,173.94,145.77,14.09,0.2,Technology,no earnings <10d,12-mo momentum + tight range,CLEAR,unscreened (no API key),,,,model
+2026-06-10,LRCX,5,2.285,327.16,288.9,19.13,0.2,Technology,no earnings <10d,12-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),,,,model
