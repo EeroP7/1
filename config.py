@@ -54,3 +54,15 @@ MIROFISH_REFRESH_MIN   = int(os.getenv("MIROFISH_REFRESH_MIN", "15"))  # re-run 
 MIROFISH_AGENT_COUNT   = int(os.getenv("MIROFISH_AGENT_COUNT", "500"))
 MIROFISH_MIN_CONFIDENCE = 0.60   # minimum swarm confidence to allow trading
 MIROFISH_LLM_API_KEY   = os.getenv("LLM_API_KEY", "")   # same key as MiroFish .env
+
+# ── Copy trading ──────────────────────────────────────────────────────────────
+POLY_DATA_API          = "https://data-api.polymarket.com"
+COPY_ENABLED           = os.getenv("COPY_ENABLED", "true").lower() == "true"
+COPY_TOP_N             = int(os.getenv("COPY_TOP_N", "20"))       # wallets to track
+COPY_LEADERBOARD_WINDOW = "ALL"   # DAY / WEEK / MONTH / ALL
+COPY_POLL_INTERVAL     = 15       # seconds between activity polls per wallet
+COPY_LEADERBOARD_REFRESH = 3600   # re-fetch leaderboard every hour
+COPY_RISK_PER_TRADE    = 0.003    # 0.3% of balance per copied trade
+COPY_MIN_TRADE_USD     = 20.0     # ignore whale trades smaller than this
+COPY_MAX_TRADE_USD     = 500.0    # cap copy size at $500 regardless of wallet size
+COPY_MARKET_COOLDOWN   = 300      # don't copy same market twice within 5 min

@@ -1,36 +1,40 @@
 """
-Polymarket BTC UP/DOWN 5MIN scalper — main entry point.
+Polymarket dual-strategy bot.
 
-Signal stack (all three must agree before trading):
-  1. MiroFish swarm     — macro direction from social simulation
-  2. Force-graph        — micro cluster convergence from physics simulation
-  3. Binance mark price — CLOB lag detection (the actual arbitrage edge)
+Strategy A — BTC UP/DOWN 5MIN arbitrage
+  Binance futures mark price lag vs Polymarket CLOB,
+  confirmed by MiroFish swarm + force-graph physics simulation.
 
-  BinanceFeed ──→ Indicators ──→ ForceGraph ──→ ExecutionEngine
-       │                              │                │
-       │          MirofishClient ─────┘                │
-       │          (refreshes every 15 min)             │
-       └──────────────────────────────────────→ PolymarketClient
+Strategy B — Leaderboard copy trading
+  Polls top-20 Polymarket wallets by all-time PNL every 15s,
+  mirrors new BUY trades with scaled size.
 
-Run:
-  python main.py
+Both strategies share one RiskState (daily cap applies across both).
 
-Stop cleanly with Ctrl-C.
+Run:  python main.py
+Stop: Ctrl-C
 """
 import asyncio
+import logging
 import signal
 import time
 
-from config import MIROFISH_ENABLED, STARTING_BALANCE
-from execution.engine import ExecutionEngine
+from config import (
+    MIROFISH_ENABLED, COPY_ENABLED, STARTING_BALANCE,
+)
+from copytrading.engine import CopyEngine
+from copytrading.tracker import WalletTracker
+from execution.engine import ExecutionEngine, RiskState
 from feeds.binance_ws import BinanceFeed
 from feeds.indicators import compute as compute_indicators
 from polymarket.clob_client import PolymarketClient
 from signal.force_graph import ForceGraph
 from terminal.display import Dashboard
 
-TICK_INTERVAL_MS = 100   # evaluate every 100ms
-MARKET_POLL_MS   = 200   # refresh Polymarket CLOB every 200ms
+logging.basicConfig(level=logging.WARNING)
+
+TICK_INTERVAL_MS = 100
+MARKET_POLL_MS   = 200
 
 
 def _seconds_to_5min_close() -> float:
@@ -38,13 +42,16 @@ def _seconds_to_5min_close() -> float:
 
 
 async def main() -> None:
-    # ── initialise core components ────────────────────────────────────────────
+    # ── shared components ─────────────────────────────────────────────────────
+    clob       = PolymarketClient()
+    shared_risk = RiskState(balance=STARTING_BALANCE)
+
+    # ── Strategy A: BTC arbitrage ─────────────────────────────────────────────
     feed   = BinanceFeed()
     graph  = ForceGraph()
-    clob   = PolymarketClient()
-    engine = ExecutionEngine(clob)
+    arb_engine = ExecutionEngine(clob, shared_risk)
 
-    print("Starting Binance feed (spot + futures + aggTrade)…")
+    print("Starting Binance feed…")
     await feed.start()
     await feed.wait_ready()
     print("Binance feed ready.")
@@ -54,14 +61,26 @@ async def main() -> None:
     if MIROFISH_ENABLED:
         from mirofish.client import MirofishClient
         mirofish = MirofishClient()
-        engine.set_mirofish(mirofish)
-        print("MiroFish enabled — will connect to localhost:5001")
+        arb_engine.set_mirofish(mirofish)
+        print("MiroFish enabled — connecting to localhost:5001")
 
+    # ── Strategy B: copy trading ──────────────────────────────────────────────
+    copy_tracker = None
+    copy_engine  = None
+    if COPY_ENABLED:
+        signal_queue = asyncio.Queue()
+        copy_tracker = WalletTracker(signal_queue)
+        copy_engine  = CopyEngine(clob, shared_risk, signal_queue)
+        await copy_tracker.start()
+        await copy_engine.start()
+        print(f"Copy trading enabled — tracking top wallets")
+
+    # ── Polymarket market discovery ───────────────────────────────────────────
     print("Discovering Polymarket BTC UP/DOWN 5MIN market…")
-    found = await clob.discover_market()
-    status = "Polymarket market found" if found else "market not found — dry run"
+    found  = await clob.discover_market()
+    status = "BTC market found" if found else "BTC market not found — copy only"
 
-    market_state = None
+    market_state     = None
     last_market_poll = 0.0
     mirofish_started = False
 
@@ -79,24 +98,25 @@ async def main() -> None:
         while not stop_event.is_set():
             tick_start = time.monotonic()
 
-            # 1. Refresh Polymarket CLOB (throttled)
+            # CLOB poll (throttled)
             now = time.time()
             if found and (now - last_market_poll) * 1000 >= MARKET_POLL_MS:
                 market_state = await clob.get_market_state()
                 last_market_poll = now
 
-            # 2. Binance snapshot
+            # Binance snapshot
             snap = await feed.get_snapshot()
             if not snap or not snap.klines:
                 dash.update(None, None, market_state, None, None,
-                            engine.risk, engine.history, "waiting for Binance…")
+                            shared_risk, arb_engine.history,
+                            copy_tracker, copy_engine, "waiting for Binance…")
                 await asyncio.sleep(0.05)
                 continue
 
-            # 3. Indicators
+            # Indicators
             ind = compute_indicators(snap.klines, snap.effective_price)
 
-            # 4. Start MiroFish background simulation once we have real data
+            # Start MiroFish once data is live
             if mirofish and not mirofish_started:
                 await mirofish.start(snap, ind)
                 mirofish_started = True
@@ -104,42 +124,46 @@ async def main() -> None:
             elif mirofish:
                 await mirofish.update_context(snap, ind)
 
-            # 5. Force-graph signal
+            # Force-graph signal
             yes_price = market_state.mid_yes if market_state else 0.5
             no_price  = market_state.mid_no  if market_state else 0.5
             ttc = _seconds_to_5min_close()
             sig = graph.evaluate(snap, ind, yes_price, no_price, ttc)
 
-            # 6. Execute (three-layer gate inside engine)
-            if market_state and not engine.risk.halted:
-                record = await engine.evaluate_and_trade(snap, ind, market_state, sig)
+            # Strategy A: arb
+            if market_state and not shared_risk.halted:
+                record = await arb_engine.evaluate_and_trade(snap, ind, market_state, sig)
                 if record:
                     status = (
-                        f"{record.outcome.value} {record.side} "
-                        f"{record.pnl:+.2f}  lag={record.lag_at_entry:.3f}  "
-                        f"age={record.edge_age_ms}ms | {record.reason}"
+                        f"ARB {record.outcome.value} {record.side} "
+                        f"{record.pnl:+.2f}  lag={record.lag_at_entry:.3f} | {record.reason}"
                     )
 
-            # 7. Dashboard
+            # Dashboard
             mf_sig = mirofish.signal if mirofish else None
             dash.update(snap, ind, market_state, sig, mf_sig,
-                        engine.risk, engine.history, status)
+                        shared_risk, arb_engine.history,
+                        copy_tracker, copy_engine, status)
 
-            # 8. Pace
+            # Pace
             elapsed_ms = (time.monotonic() - tick_start) * 1000
-            sleep_ms   = max(0.0, TICK_INTERVAL_MS - elapsed_ms)
-            await asyncio.sleep(sleep_ms / 1000)
+            await asyncio.sleep(max(0.0, TICK_INTERVAL_MS - elapsed_ms) / 1000)
 
     # ── shutdown ──────────────────────────────────────────────────────────────
+    if copy_tracker:
+        await copy_tracker.stop()
+    if copy_engine:
+        await copy_engine.stop()
     if mirofish:
         await mirofish.stop()
     await feed.stop()
 
-    print("\nBot stopped cleanly.")
-    r = engine.risk
+    print("\nBot stopped.")
+    r = shared_risk
+    total_trades = r.trades_today
     print(f"  Balance : ${r.balance:,.2f}  (started ${STARTING_BALANCE:,.2f})")
     print(f"  Day P&L : {r.daily_pnl_pct:+.2%}  ({r.daily_pnl:+.2f})")
-    print(f"  Trades  : {r.trades_today}  W:{r.wins}  L:{r.losses}")
+    print(f"  Trades  : {total_trades}  W:{r.wins}  L:{r.losses}")
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 """
-Rich terminal UI — live 5-panel dashboard.
-Panels: BTC Feed | Force Graph | MiroFish Swarm | Polymarket CLOB | Risk/P&L
+Rich terminal UI — live 6-panel dashboard.
+Panels: BTC Feed | Force Graph | MiroFish Swarm | Polymarket CLOB | Copy Trading | Risk/P&L
 """
 import time
 from datetime import datetime
@@ -13,6 +13,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
+from copytrading.engine import CopyTradeRecord
 from execution.engine import RiskState, TradeRecord
 from feeds.binance_ws import BtcSnapshot
 from feeds.indicators import IndicatorSet
@@ -20,6 +21,8 @@ from polymarket.clob_client import MarketState
 from signal.force_graph import Bias, GraphSignal
 
 if TYPE_CHECKING:
+    from copytrading.engine import CopyEngine
+    from copytrading.tracker import WalletTracker
     from mirofish.client import MirofishSignal
 
 console = Console()
@@ -46,6 +49,8 @@ def build_layout(
     mf_signal: Optional["MirofishSignal"],
     risk: RiskState,
     history: list[TradeRecord],
+    copy_tracker: Optional["WalletTracker"],
+    copy_engine: Optional["CopyEngine"],
     status_msg: str,
 ) -> Layout:
     layout = Layout()
@@ -67,14 +72,15 @@ def build_layout(
         Layout(name="mirofish_panel", ratio=1),
     )
     layout["body"]["right"].split_column(
-        Layout(name="market_panel", ratio=1),
-        Layout(name="risk_panel", ratio=1),
+        Layout(name="market_panel", ratio=2),
+        Layout(name="copy_panel", ratio=3),
+        Layout(name="risk_panel", ratio=2),
     )
 
     # ── header ────────────────────────────────────────────────────────────────
     ts = datetime.now().strftime("%H:%M:%S.%f")[:-3]
     hdr = Text()
-    hdr.append("  POLYMARKET BTC 5MIN SCALPER  ", style="bold white on blue")
+    hdr.append("  POLYMARKET BTC 5MIN SCALPER + COPY TRADING  ", style="bold white on blue")
     hdr.append(f"  {ts}", style="dim white")
     hdr.append(f"  {status_msg}", style="yellow")
     layout["header"].update(Panel(hdr, style="blue"))
@@ -137,7 +143,6 @@ def build_layout(
             mf_table.add_row("Last Run",      Text(age_str, style=stale_style))
             mf_table.add_row("Status",        Text("LIVE", style="green"))
             if mf_signal.reasoning:
-                # truncate reasoning to fit panel
                 reason = mf_signal.reasoning[:120].replace("\n", " ")
                 mf_table.add_row("Reasoning",    Text(reason, style="dim"))
         else:
@@ -162,6 +167,69 @@ def build_layout(
     else:
         mkt_table.add_row("Status", "Connecting…")
     layout["market_panel"].update(Panel(mkt_table, title="[cyan]Polymarket CLOB[/cyan]"))
+
+    # ── Copy trading panel ────────────────────────────────────────────────────
+    copy_table = Table.grid(padding=(0, 1))
+    copy_table.add_column(style="dim", width=3)   # rank
+    copy_table.add_column(width=10)               # username
+    copy_table.add_column(width=8)                # market (truncated)
+    copy_table.add_column(width=5)                # side/outcome
+    copy_table.add_column(style="bold", width=7)  # size
+
+    if copy_tracker is not None:
+        wallets = copy_tracker.wallets
+        n_wallets = len(wallets)
+        copy_table.add_row(
+            Text(f"Tracking {n_wallets} wallets", style="bold cyan"),
+            "", "", "", "",
+        )
+        copy_table.add_row("", "", "", "", "")  # spacer
+    else:
+        copy_table.add_row(Text("Disabled", style="dim"), "", "", "", "")
+
+    if copy_engine is not None:
+        ch = copy_engine.history
+        executed = [r for r in ch if not r.skipped]
+        skipped  = [r for r in ch if r.skipped]
+        copy_table.add_row(
+            Text(f"Copied: {len(executed)}  Skipped: {len(skipped)}", style="dim"),
+            "", "", "", "",
+        )
+        copy_table.add_row("", "", "", "", "")  # spacer
+
+        # show last 5 executed trades, newest first
+        recent = list(reversed(executed[-5:])) if executed else []
+        if recent:
+            copy_table.add_row(
+                Text("#", style="dim"), Text("Wallet", style="dim"),
+                Text("Market", style="dim"), Text("Side", style="dim"),
+                Text("$Size", style="dim"),
+            )
+            for rec in recent:
+                side_style = "green" if rec.side == "BUY" else "red"
+                copy_table.add_row(
+                    Text(str(rec.source_rank), style="dim"),
+                    Text(rec.source_username[:10], style="cyan"),
+                    Text(rec.market_title[:8], style="dim"),
+                    Text(f"{rec.side[:1]} {rec.outcome[:2]}", style=side_style),
+                    Text(f"${rec.size_usd:.0f}", style="bold green"),
+                )
+        else:
+            copy_table.add_row(
+                Text("No trades yet", style="dim"), "", "", "", "",
+            )
+
+        # last skipped reason
+        if skipped:
+            last_skip = skipped[-1]
+            copy_table.add_row("", "", "", "", "")
+            copy_table.add_row(
+                Text(f"Last skip: {last_skip.skip_reason[:28]}", style="dim yellow"),
+                "", "", "", "",
+            )
+    layout["copy_panel"].update(
+        Panel(copy_table, title="[yellow]Copy Trading[/yellow]")
+    )
 
     # ── Risk / P&L panel ──────────────────────────────────────────────────────
     risk_table = Table.grid(padding=(0, 2))
@@ -190,8 +258,8 @@ def build_layout(
 
     # ── footer ────────────────────────────────────────────────────────────────
     footer = Text(
-        "  Ctrl-C: quit  |  Binance mark price arb  |  "
-        "MiroFish swarm gate  |  0.5% risk  |  2% daily cap  |  -0.4% stop",
+        "  Ctrl-C: quit  |  Arb: Binance mark price + MiroFish  |  "
+        "Copy: top-20 leaderboard wallets  |  0.5% risk  |  2% daily cap  |  -0.4% stop",
         style="dim"
     )
     layout["footer"].update(Panel(footer, style="dim"))
@@ -221,9 +289,11 @@ class Dashboard:
         mf_signal: Optional["MirofishSignal"],
         risk: RiskState,
         history: list[TradeRecord],
+        copy_tracker: Optional["WalletTracker"] = None,
+        copy_engine: Optional["CopyEngine"] = None,
         status: str = "",
     ) -> None:
         if self._live:
             layout = build_layout(snap, ind, market, signal, mf_signal,
-                                  risk, history, status)
+                                  risk, history, copy_tracker, copy_engine, status)
             self._live.update(layout)
