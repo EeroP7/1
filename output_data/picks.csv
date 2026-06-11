@@ -19,3 +19,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-06-10,MU,3,2.2079,935.89,778.95,78.47,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
 2026-06-10,WDC,4,2.1549,517.72,450.39,33.66,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
 2026-06-10,DOCN,5,2.1408,168.33,141.4,13.46,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-06-11,SNDK,1,2.4773,1643.23,1357.66,142.79,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-06-11,MXL,2,2.1912,71.95,49.37,11.29,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-06-11,DOCN,3,2.1592,171.47,144.37,13.55,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-06-11,MU,4,2.1517,891.88,729.61,81.13,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
+2026-06-11,AEHR,5,2.1451,93.32,66.86,13.23,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
