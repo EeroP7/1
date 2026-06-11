@@ -13,7 +13,7 @@ from typing import Optional
 
 from config import (
     COPY_RISK_PER_TRADE, COPY_MAX_TRADE_USD,
-    COPY_MARKET_COOLDOWN, SLIPPAGE_LIMIT,
+    COPY_MARKET_COOLDOWN, SLIPPAGE_LIMIT, DAILY_CAP_RISK,
 )
 from copytrading.tracker import CopySignal
 from execution.engine import RiskState, TradeOutcome
@@ -119,7 +119,7 @@ class CopyEngine:
         # ── guards ────────────────────────────────────────────────────────────
         if self._risk.halted:
             return skip("risk halted")
-        if self._risk.daily_pnl_pct <= -0.02:
+        if self._risk.daily_pnl_pct <= -DAILY_CAP_RISK:
             return skip("daily cap hit")
         if not sig.token_id:
             return skip("no token_id")

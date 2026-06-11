@@ -34,8 +34,8 @@ EDGE_EXPIRE_MS   = 80         # discard edge if older than 80ms
 
 # ── Risk controls ─────────────────────────────────────────────────────────────
 STARTING_BALANCE = float(os.getenv("STARTING_BALANCE", "1000"))
-PER_TRADE_RISK   = 0.005      # 0.5% of balance per trade
-DAILY_CAP_RISK   = 0.02       # stop trading after 2% daily drawdown
+PER_TRADE_RISK   = float(os.getenv("PER_TRADE_RISK", "0.005"))  # fraction of balance per arb trade
+DAILY_CAP_RISK   = float(os.getenv("DAILY_CAP_RISK", "0.02"))   # halt after this daily drawdown
 HARD_STOP        = -0.004     # -0.4% unrealised loss → exit immediately
 MIN_LIQUIDITY    = 200        # minimum $200 on best bid/ask before entering
 MAX_SPREAD       = 0.015      # skip if spread > 1.5%
