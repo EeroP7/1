@@ -76,12 +76,14 @@ async def main() -> None:
         print(f"Copy trading enabled — tracking top wallets")
 
     # ── Polymarket market discovery ───────────────────────────────────────────
-    print("Discovering Polymarket BTC UP/DOWN 5MIN market…")
+    print("Discovering Polymarket Bitcoin Up-or-Down market…")
     found  = await clob.discover_market()
-    status = "BTC market found" if found else "BTC market not found — copy only"
+    status = (f"market: {clob.market_question[:48]}" if found
+              else "BTC market not found yet — copy only")
 
     market_state     = None
     last_market_poll = 0.0
+    last_discover    = time.time()
     mirofish_started = False
 
     stop_event = asyncio.Event()
@@ -98,8 +100,16 @@ async def main() -> None:
         while not stop_event.is_set():
             tick_start = time.monotonic()
 
-            # CLOB poll (throttled)
+            # re-discover when market missing or its window has rolled over
             now = time.time()
+            if (not found or clob.market_ended()) and now - last_discover >= 20:
+                found = await clob.discover_market()
+                last_discover = now
+                if found:
+                    market_state = None
+                    status = f"market: {clob.market_question[:48]}"
+
+            # CLOB poll (throttled)
             if found and (now - last_market_poll) * 1000 >= MARKET_POLL_MS:
                 market_state = await clob.get_market_state()
                 last_market_poll = now

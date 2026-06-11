@@ -125,6 +125,7 @@ class BinanceFeed:
             asyncio.create_task(self._run_spot_ws()),
             asyncio.create_task(self._run_agg_trade_ws()),
             asyncio.create_task(self._run_futures_ws()),
+            asyncio.create_task(self._poll_mark_rest()),
         ]
 
     async def wait_ready(self) -> None:
@@ -270,9 +271,36 @@ class BinanceFeed:
     async def _handle_mark_price(self, msg: dict) -> None:
         data = msg.get("data", {})
         async with self._lock:
-            self._mark_price   = float(data.get("p", self._mark_price))
-            self._funding_rate = float(data.get("r", 0))
-            self._mark_ts      = int(data.get("T", time.time() * 1000))
+            self._mark_price   = float(data.get("p") or self._mark_price)
+            self._funding_rate = float(data.get("r") or 0)
+            self._mark_ts      = int(data.get("E") or time.time() * 1000)
+
+    async def _poll_mark_rest(self) -> None:
+        """
+        REST fallback: keeps the mark price fresh when the futures WebSocket
+        is unreachable (blocked network, silent disconnect). Only kicks in
+        when the WS hasn't delivered an update for >5 seconds.
+        """
+        url = (
+            f"{BINANCE_FUTURES_REST}/fapi/v1/premiumIndex"
+            f"?symbol={self._sym.upper()}"
+        )
+        while True:
+            try:
+                now_ms = int(time.time() * 1000)
+                if now_ms - self._mark_ts > 5000:
+                    async with aiohttp.ClientSession() as s:
+                        async with s.get(
+                            url, timeout=aiohttp.ClientTimeout(total=5)
+                        ) as r:
+                            data = await r.json()
+                    async with self._lock:
+                        self._mark_price   = float(data.get("markPrice") or 0)
+                        self._funding_rate = float(data.get("lastFundingRate") or 0)
+                        self._mark_ts      = now_ms
+            except Exception:
+                pass
+            await asyncio.sleep(2)
 
 
 # ── helpers ───────────────────────────────────────────────────────────────────
@@ -298,6 +326,9 @@ async def _ws_loop(uri: str, handler) -> None:
                 backoff = 1
                 async for raw in ws:
                     await handler(json.loads(raw))
-        except (websockets.WebSocketException, OSError):
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            # any error (connect refused, bad frame, handler bug) → reconnect
             await asyncio.sleep(backoff)
             backoff = min(backoff * 2, 30)

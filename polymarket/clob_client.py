@@ -8,14 +8,16 @@ Wraps py-clob-client to:
   - Track fills and open positions
 """
 import asyncio
+import json
 import time
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Optional
 
+import aiohttp
+
 from py_clob_client.client import ClobClient
-from py_clob_client.clob_types import (
-    ApiCreds, OrderArgs, OrderType, PartialCreateOrderOptions,
-)
+from py_clob_client.clob_types import ApiCreds, OrderArgs, OrderType
 from py_clob_client.order_builder.constants import BUY, SELL
 
 from config import (
@@ -58,7 +60,7 @@ class PolymarketClient:
     All CLOB calls are dispatched to a thread pool to avoid blocking the event loop.
     """
 
-    BTC_5MIN_SLUG = "will-btc-price-increase-in-the-next-5-minutes"
+    GAMMA_HOST = "https://gamma-api.polymarket.com"
 
     def __init__(self) -> None:
         creds = ApiCreds(
@@ -75,6 +77,8 @@ class PolymarketClient:
         self._condition_id: Optional[str] = None
         self._yes_token_id: Optional[str] = None
         self._no_token_id: Optional[str] = None
+        self.market_question: str = ""
+        self._market_end_ts: float = 0.0
         self._loop = asyncio.get_event_loop()
         self._open_positions: dict[str, OpenPosition] = {}
 
@@ -82,30 +86,91 @@ class PolymarketClient:
 
     async def discover_market(self) -> bool:
         """
-        Searches for the active BTC UP/DOWN 5MIN market.
-        Returns True if found.
+        Finds the live Bitcoin Up-or-Down market via the public Gamma API.
+
+        The up/down series is recurring (new market every window), so we sort
+        active markets by endDate ascending and take the soonest-ending one
+        whose question matches — that's the current window.
         """
+        now = time.time()
         try:
-            markets = await self._run(
-                self._client.get_markets,
-                next_cursor="MA==",
-            )
-            for market in markets.get("data", []):
-                slug = market.get("market_slug", "")
-                if "btc" in slug.lower() and "5" in slug and "minute" in slug.lower():
-                    self._condition_id = market["condition_id"]
-                    tokens = market.get("tokens", [])
-                    for tok in tokens:
-                        if tok.get("outcome", "").upper() == "YES":
-                            self._yes_token_id = tok["token_id"]
-                        elif tok.get("outcome", "").upper() == "NO":
-                            self._no_token_id = tok["token_id"]
-                    return self._yes_token_id is not None
+            async with aiohttp.ClientSession() as session:
+                async with session.get(
+                    f"{self.GAMMA_HOST}/markets",
+                    params={
+                        "active":       "true",
+                        "closed":       "false",
+                        "order":        "endDate",
+                        "ascending":    "true",
+                        "limit":        "300",
+                        # only windows that are still open (skips stale listings)
+                        "end_date_min": datetime.utcfromtimestamp(now).strftime(
+                            "%Y-%m-%dT%H:%M:%SZ"),
+                    },
+                    timeout=aiohttp.ClientTimeout(total=10),
+                ) as resp:
+                    resp.raise_for_status()
+                    markets = await resp.json()
         except Exception:
-            pass
+            return False
+
+        for m in markets if isinstance(markets, list) else []:
+            text = f"{m.get('question', '')} {m.get('slug', '')}".lower()
+            if "bitcoin" not in text and "btc" not in text:
+                continue
+            if "up or down" not in text and "up-or-down" not in text:
+                continue
+            try:
+                token_ids = m.get("clobTokenIds") or "[]"
+                if isinstance(token_ids, str):
+                    token_ids = json.loads(token_ids)
+                if len(token_ids) < 2:
+                    continue
+                outcomes = m.get("outcomes") or '["Yes", "No"]'
+                if isinstance(outcomes, str):
+                    outcomes = json.loads(outcomes)
+
+                # first outcome is the bullish one ("Up"/"Yes")
+                first_bull = str(outcomes[0]).lower() in ("yes", "up")
+                self._yes_token_id = token_ids[0] if first_bull else token_ids[1]
+                self._no_token_id  = token_ids[1] if first_bull else token_ids[0]
+                self._condition_id = m.get("conditionId", "")
+                self.market_question = m.get("question", "")
+
+                end = m.get("endDate") or ""
+                try:
+                    end_ts = datetime.fromisoformat(
+                        end.replace("Z", "+00:00")
+                    ).timestamp()
+                except ValueError:
+                    continue
+                if end_ts <= now:        # window already closed → not live
+                    continue
+                self._market_end_ts = end_ts
+                return True
+            except Exception:
+                continue
         return False
 
+    def market_ended(self) -> bool:
+        """True once the discovered market's window has closed."""
+        return bool(self._market_end_ts) and time.time() > self._market_end_ts
+
     # ── order book polling ────────────────────────────────────────────────────
+
+    @staticmethod
+    def _levels(book, side: str) -> list[tuple[float, float]]:
+        """Normalise order-book levels to (price, size) — the CLOB client
+        returns OrderBookSummary objects, raw REST returns dicts."""
+        raw = (book.get(side, []) if isinstance(book, dict)
+               else getattr(book, side, None)) or []
+        out = []
+        for lvl in raw:
+            if isinstance(lvl, dict):
+                out.append((float(lvl["price"]), float(lvl["size"])))
+            else:
+                out.append((float(lvl.price), float(lvl.size)))
+        return out
 
     async def get_market_state(self) -> Optional[MarketState]:
         if not self._yes_token_id or not self._no_token_id:
@@ -115,20 +180,16 @@ class PolymarketClient:
                 self._run(self._client.get_order_book, self._yes_token_id),
                 self._run(self._client.get_order_book, self._no_token_id),
             )
-            yes_bids = yes_book.get("bids", [])
-            yes_asks = yes_book.get("asks", [])
-            no_bids  = no_book.get("bids", [])
-            no_asks  = no_book.get("asks", [])
+            yes_bids = self._levels(yes_book, "bids")
+            yes_asks = self._levels(yes_book, "asks")
+            no_bids  = self._levels(no_book, "bids")
+            no_asks  = self._levels(no_book, "asks")
 
-            yes_bid = float(yes_bids[0]["price"]) if yes_bids else 0.0
-            yes_ask = float(yes_asks[0]["price"]) if yes_asks else 1.0
-            no_bid  = float(no_bids[0]["price"])  if no_bids  else 0.0
-            no_ask  = float(no_asks[0]["price"])  if no_asks  else 1.0
-
-            yes_bid_sz = float(yes_bids[0]["size"]) if yes_bids else 0.0
-            yes_ask_sz = float(yes_asks[0]["size"]) if yes_asks else 0.0
-            no_bid_sz  = float(no_bids[0]["size"])  if no_bids  else 0.0
-            no_ask_sz  = float(no_asks[0]["size"])  if no_asks  else 0.0
+            # best bid = highest price, best ask = lowest (sort order varies)
+            yes_bid, yes_bid_sz = max(yes_bids, default=(0.0, 0.0))
+            yes_ask, yes_ask_sz = min(yes_asks, default=(1.0, 0.0))
+            no_bid,  no_bid_sz  = max(no_bids,  default=(0.0, 0.0))
+            no_ask,  no_ask_sz  = min(no_asks,  default=(1.0, 0.0))
 
             return MarketState(
                 condition_id=self._condition_id,
@@ -163,10 +224,8 @@ class PolymarketClient:
                 size=round(size, 2),
                 side=BUY if side == "BUY" else SELL,
             )
-            opts = PartialCreateOrderOptions(tick_size=0.01)
-            signed_order = await self._run(
-                self._client.create_order, args, opts
-            )
+            # let the client resolve the market's tick size + neg-risk flag
+            signed_order = await self._run(self._client.create_order, args)
             resp = await self._run(
                 self._client.post_order, signed_order, order_type
             )
