@@ -105,9 +105,10 @@ class ExecutionEngine:
     MAX_HOLD_SECONDS = 290
     TARGET_PROFIT    = 0.005
 
-    def __init__(self, clob: PolymarketClient) -> None:
+    def __init__(self, clob: PolymarketClient,
+                 risk: Optional[RiskState] = None) -> None:
         self._clob    = clob
-        self._risk    = RiskState(balance=STARTING_BALANCE)
+        self._risk    = risk or RiskState(balance=STARTING_BALANCE)
         self._history: list[TradeRecord] = []
         self._active: Optional[OpenPosition] = None
         self._edge_detected_at: int = 0
