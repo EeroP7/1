@@ -120,6 +120,10 @@ class PolymarketClient:
                 continue
             if "up or down" not in text and "up-or-down" not in text:
                 continue
+            # strictly the 5-min series: question has a time RANGE like
+            # "6:15AM-6:20AM ET" — hourly markets ("7AM ET") have no range
+            if "am-" not in text and "pm-" not in text:
+                continue
             try:
                 token_ids = m.get("clobTokenIds") or "[]"
                 if isinstance(token_ids, str):
