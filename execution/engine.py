@@ -24,7 +24,7 @@ from config import (
 from feeds.binance_ws import BtcSnapshot
 from feeds.indicators import IndicatorSet
 from polymarket.clob_client import MarketState, OpenPosition, PolymarketClient
-from signal.force_graph import Bias, GraphSignal
+from forcegraph.force_graph import Bias, GraphSignal
 
 if TYPE_CHECKING:
     from mirofish.client import MirofishClient, MirofishSignal

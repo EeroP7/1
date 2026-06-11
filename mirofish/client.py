@@ -33,7 +33,7 @@ from config import (
 from feeds.binance_ws import BtcSnapshot
 from feeds.indicators import IndicatorSet
 from mirofish.context_builder import build_context, build_requirement
-from signal.force_graph import Bias
+from forcegraph.force_graph import Bias
 
 log = logging.getLogger(__name__)
 

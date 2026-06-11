@@ -28,7 +28,7 @@ from execution.engine import ExecutionEngine, RiskState
 from feeds.binance_ws import BinanceFeed
 from feeds.indicators import compute as compute_indicators
 from polymarket.clob_client import PolymarketClient
-from signal.force_graph import ForceGraph
+from forcegraph.force_graph import ForceGraph
 from terminal.display import Dashboard
 
 logging.basicConfig(level=logging.WARNING)
