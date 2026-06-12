@@ -55,7 +55,14 @@ MIROFISH_AGENT_COUNT   = int(os.getenv("MIROFISH_AGENT_COUNT", "500"))
 MIROFISH_MIN_CONFIDENCE = 0.60   # minimum swarm confidence to allow trading
 MIROFISH_LLM_API_KEY   = os.getenv("LLM_API_KEY", "")   # same key as MiroFish .env
 
-# ── Copy trading ──────────────────────────────────────────────────────────────
+# ── Momentum betting (Strategy C) ────────────────────────────────────────────
+# Bets once per 5-min window based on BTC mark-price direction.
+# Fires every ~5 minutes regardless of force-graph convergence.
+MOMENTUM_ENABLED       = os.getenv("MOMENTUM_ENABLED", "true").lower() == "true"
+MOMENTUM_RISK_PER_TRADE = float(os.getenv("MOMENTUM_RISK_PER_TRADE", "0.02"))  # 2% of balance per bet
+MOMENTUM_MIN_MOVE      = float(os.getenv("MOMENTUM_MIN_MOVE", "0.0003"))  # min 0.03% mark move to bet
+MOMENTUM_ENTRY_SECONDS = int(os.getenv("MOMENTUM_ENTRY_SECONDS", "60"))   # bet within first N sec of window
+
 POLY_DATA_API          = "https://data-api.polymarket.com"
 COPY_ENABLED           = os.getenv("COPY_ENABLED", "true").lower() == "true"
 COPY_TOP_N             = int(os.getenv("COPY_TOP_N", "20"))       # wallets to track

@@ -20,11 +20,11 @@ import signal
 import time
 
 from config import (
-    MIROFISH_ENABLED, COPY_ENABLED, STARTING_BALANCE,
+    MIROFISH_ENABLED, COPY_ENABLED, STARTING_BALANCE, MOMENTUM_ENABLED,
 )
 from copytrading.engine import CopyEngine
 from copytrading.tracker import WalletTracker
-from execution.engine import ExecutionEngine, RiskState
+from execution.engine import ExecutionEngine, MomentumEngine, RiskState
 from feeds.binance_ws import BinanceFeed
 from feeds.indicators import compute as compute_indicators
 from polymarket.clob_client import PolymarketClient
@@ -49,7 +49,8 @@ async def main() -> None:
     # ── Strategy A: BTC arbitrage ─────────────────────────────────────────────
     feed   = BinanceFeed()
     graph  = ForceGraph()
-    arb_engine = ExecutionEngine(clob, shared_risk)
+    arb_engine      = ExecutionEngine(clob, shared_risk)
+    momentum_engine = MomentumEngine(clob, shared_risk) if MOMENTUM_ENABLED else None
 
     print("Starting Binance feed…")
     await feed.start()
@@ -148,6 +149,12 @@ async def main() -> None:
                         f"ARB {record.outcome.value} {record.side} "
                         f"{record.pnl:+.2f}  lag={record.lag_at_entry:.3f} | {record.reason}"
                     )
+
+            # Strategy C: momentum bet once per window
+            if momentum_engine and market_state and not shared_risk.halted:
+                ms = await momentum_engine.evaluate(snap, market_state)
+                if ms:
+                    status = ms
 
             # Dashboard
             mf_sig = mirofish.signal if mirofish else None

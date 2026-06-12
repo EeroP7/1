@@ -20,6 +20,7 @@ from config import (
     STARTING_BALANCE, PER_TRADE_RISK, DAILY_CAP_RISK, HARD_STOP,
     MIN_LIQUIDITY, MAX_SPREAD, LAG_THRESHOLD, SLIPPAGE_LIMIT, EDGE_EXPIRE_MS,
     MIROFISH_ENABLED, MIROFISH_MIN_CONFIDENCE,
+    MOMENTUM_RISK_PER_TRADE, MOMENTUM_MIN_MOVE, MOMENTUM_ENTRY_SECONDS,
 )
 from feeds.binance_ws import BtcSnapshot
 from feeds.indicators import IndicatorSet
@@ -350,3 +351,99 @@ class ExecutionEngine:
         self._risk.register_trade(pnl, outcome)
         self._history.append(record)
         return record
+
+
+class MomentumEngine:
+    """
+    Strategy C — simple per-window momentum bet.
+
+    At the start of each new 5-min window, if BTC mark price has moved
+    ≥ MOMENTUM_MIN_MOVE from the candle open, bet in that direction.
+    Places at most one order per window, within the first
+    MOMENTUM_ENTRY_SECONDS seconds.
+    """
+
+    def __init__(self, clob: PolymarketClient, risk: RiskState) -> None:
+        self._clob     = clob
+        self._risk     = risk
+        self._history: list[TradeRecord] = []
+        self._last_condition_id: str = ""
+        self._bet_placed_this_window: bool = False
+        self._window_open_price: float = 0.0
+        self._window_start_ts: float = 0.0
+
+    @property
+    def history(self) -> list[TradeRecord]:
+        return list(self._history)
+
+    async def evaluate(
+        self,
+        snap: BtcSnapshot,
+        market: MarketState,
+    ) -> Optional[str]:
+        """
+        Call every tick. Returns a status string on a new bet, else None.
+        """
+        if self._risk.halted:
+            return None
+        if self._risk.daily_pnl_pct <= -DAILY_CAP_RISK:
+            return None
+        if not snap.klines:
+            return None
+
+        current_candle = snap.klines[0]   # most-recent first (reversed in feed)
+        cid = market.condition_id
+
+        # new window → reset state
+        if cid != self._last_condition_id:
+            self._last_condition_id      = cid
+            self._bet_placed_this_window = False
+            self._window_open_price      = current_candle.open
+            self._window_start_ts        = time.time()
+
+        if self._bet_placed_this_window:
+            return None
+
+        # only enter in the first N seconds of the window
+        elapsed = time.time() - self._window_start_ts
+        if elapsed > MOMENTUM_ENTRY_SECONDS:
+            return None
+
+        ref_price = snap.mark_price if snap.mark_price > 0 else snap.price
+        if self._window_open_price <= 0:
+            return None
+
+        move = (ref_price - self._window_open_price) / self._window_open_price
+
+        if abs(move) < MOMENTUM_MIN_MOVE:
+            return None  # not enough momentum yet — wait
+
+        go_up = move > 0
+        token_id   = market.yes_token_id if go_up else market.no_token_id
+        ask_price  = market.yes_ask      if go_up else market.no_ask
+        side_label = "UP" if go_up else "DOWN"
+
+        if ask_price <= 0 or ask_price >= 1:
+            return None
+
+        size_usd = self._risk.balance * MOMENTUM_RISK_PER_TRADE
+        size     = round(size_usd / ask_price, 2)
+        if size < 1.0:
+            return None
+
+        limit_price = round(min(ask_price * 1.005, 0.99), 4)
+        order_id = await self._clob.place_order(
+            token_id=token_id,
+            side="BUY",
+            size=size,
+            price=limit_price,
+        )
+
+        self._bet_placed_this_window = True
+
+        status = (
+            f"MOMENTUM {side_label}  move={move:+.3%} "
+            f"@ {ask_price:.3f}  ${size_usd:.2f}  "
+            f"{'OK' if order_id else 'FAILED'}"
+        )
+        return status
