@@ -150,9 +150,11 @@ async def main() -> None:
                         f"{record.pnl:+.2f}  lag={record.lag_at_entry:.3f} | {record.reason}"
                     )
 
-            # Strategy C: momentum bet once per window
-            if momentum_engine and market_state and not shared_risk.halted:
-                ms = await momentum_engine.evaluate(snap, market_state)
+            # Strategy C: momentum bet + exit management
+            if momentum_engine and market_state:
+                ms = await momentum_engine.evaluate(
+                    snap, market_state, clob._market_end_ts
+                )
                 if ms:
                     status = ms
 
