@@ -158,10 +158,14 @@ async def main() -> None:
                 if ms:
                     status = ms
 
-            # Dashboard
+            # Dashboard — combine arb + momentum trade history, newest last
+            combined_history = arb_engine.history + (
+                momentum_engine.history if momentum_engine else []
+            )
+            combined_history.sort(key=lambda r: r.exit_time_ms)
             mf_sig = mirofish.signal if mirofish else None
             dash.update(snap, ind, market_state, sig, mf_sig,
-                        shared_risk, arb_engine.history,
+                        shared_risk, combined_history,
                         copy_tracker, copy_engine, status)
 
             # Pace

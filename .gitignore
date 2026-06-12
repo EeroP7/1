@@ -2,3 +2,5 @@ __pycache__/
 *.pyc
 *.pyo
 .env
+bot_memory.json
+bot_memory.json.tmp

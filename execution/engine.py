@@ -24,6 +24,7 @@ from config import (
     MOMENTUM_PROFIT_TARGET, MOMENTUM_STOP_LOSS, MOMENTUM_EXIT_BEFORE_CLOSE,
     MOMENTUM_VALUE_EDGE,
 )
+from execution.adaptive import AdaptiveMemory
 from feeds.binance_ws import BtcSnapshot
 from feeds.indicators import IndicatorSet
 from polymarket.clob_client import MarketState, OpenPosition, PolymarketClient
@@ -364,6 +365,7 @@ class MomentumPosition:
     size: float
     entry_ts: float
     market_end_ts: float
+    tag: str = ""       # adaptive-memory key, e.g. "momentum-UP"
 
 
 class MomentumEngine:
@@ -382,6 +384,7 @@ class MomentumEngine:
     def __init__(self, clob: PolymarketClient, risk: RiskState) -> None:
         self._clob     = clob
         self._risk     = risk
+        self._memory   = AdaptiveMemory()
         self._history: list[TradeRecord] = []
         self._last_condition_id: str = ""
         self._bet_placed_this_window: bool = False
@@ -392,6 +395,10 @@ class MomentumEngine:
     @property
     def history(self) -> list[TradeRecord]:
         return list(self._history)
+
+    @property
+    def memory(self) -> "AdaptiveMemory":
+        return self._memory
 
     @property
     def open_position(self) -> Optional[MomentumPosition]:
@@ -439,11 +446,13 @@ class MomentumEngine:
         elapsed  = time.time() - self._window_start_ts
 
         go_up: Optional[bool] = None
-        trigger = ""
+        kind    = ""        # "momentum" or "value" — stable across trades
+        trigger = ""        # human-readable detail for the status line
 
         # ── path 1: early momentum bet ────────────────────────────────────────
         if elapsed <= MOMENTUM_ENTRY_SECONDS and abs(move) >= MOMENTUM_MIN_MOVE:
             go_up   = move > 0
+            kind    = "momentum"
             trigger = f"momentum {move:+.3%}"
 
         # ── path 2: value bet — a side trading below chart fair value ──────────
@@ -453,9 +462,11 @@ class MomentumEngine:
             no_disc  = fair_no  - market.no_ask
             if yes_disc >= MOMENTUM_VALUE_EDGE and yes_disc >= no_disc:
                 go_up   = True
+                kind    = "value"
                 trigger = f"value YES {market.yes_ask:.2f} vs fair {fair_yes:.2f}"
             elif no_disc >= MOMENTUM_VALUE_EDGE:
                 go_up   = False
+                kind    = "value"
                 trigger = f"value NO {market.no_ask:.2f} vs fair {fair_no:.2f}"
 
         if go_up is None:
@@ -464,11 +475,20 @@ class MomentumEngine:
         token_id   = market.yes_token_id if go_up else market.no_token_id
         ask_price  = market.yes_ask      if go_up else market.no_ask
         side_label = "UP" if go_up else "DOWN"
+        tag        = f"{kind}-{side_label}"   # e.g. "value-DOWN"
+
+        # ── adaptive gate: skip tags that have been losing ────────────────────
+        if not self._memory.allow(tag):
+            self._bet_placed_this_window = True   # don't re-try this window
+            wr = self._memory.win_rate_of(tag)
+            return f"SKIP {tag} (learned: {wr:.0%} win rate, paused)"
 
         if ask_price <= 0 or ask_price >= 1:
             return None
 
-        size_usd    = self._risk.balance * MOMENTUM_RISK_PER_TRADE
+        # size scaled by what the bot has learned about this tag
+        mult        = self._memory.size_multiplier(tag)
+        size_usd    = self._risk.balance * MOMENTUM_RISK_PER_TRADE * mult
         size        = round(size_usd / ask_price, 2)
         if size < 1.0:
             return None
@@ -490,10 +510,12 @@ class MomentumEngine:
                 size=size,
                 entry_ts=time.time(),
                 market_end_ts=market_end_ts,
+                tag=tag,
             )
 
+        mult_note = f" x{mult:.2g}" if mult != 1.0 else ""
         return (
-            f"BET {side_label} [{trigger}] @ {ask_price:.3f}  ${size_usd:.2f}  "
+            f"BET {side_label} [{trigger}] @ {ask_price:.3f}  ${size_usd:.2f}{mult_note}  "
             f"{'OK' if order_id else 'FAILED'}"
         )
 
@@ -555,6 +577,11 @@ class MomentumEngine:
         )
         self._risk.register_trade(pnl, outcome)
         self._history.append(record)
+
+        # ── learn from this trade ─────────────────────────────────────────────
+        if pos.tag:
+            self._memory.record(pos.tag, won=(outcome == TradeOutcome.WIN))
+
         self._open_pos = None
 
         return (
