@@ -66,6 +66,11 @@ MOMENTUM_PROFIT_TARGET  = float(os.getenv("MOMENTUM_PROFIT_TARGET", "0.15"))    
 MOMENTUM_STOP_LOSS      = float(os.getenv("MOMENTUM_STOP_LOSS", "-0.20"))        # cut loss at -20%
 MOMENTUM_EXIT_BEFORE_CLOSE = int(os.getenv("MOMENTUM_EXIT_BEFORE_CLOSE", "30")) # force-exit N sec before window ends
 
+# Value entry: buy a side when its CLOB price is this far BELOW the chart-implied
+# fair value (e.g. 0.06 = the cheap side is undervalued by 6 cents). Fires any
+# time in the window, giving a second entry path beyond the early momentum bet.
+MOMENTUM_VALUE_EDGE     = float(os.getenv("MOMENTUM_VALUE_EDGE", "0.06"))
+
 POLY_DATA_API          = "https://data-api.polymarket.com"
 COPY_ENABLED           = os.getenv("COPY_ENABLED", "true").lower() == "true"
 COPY_TOP_N             = int(os.getenv("COPY_TOP_N", "20"))       # wallets to track

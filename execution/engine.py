@@ -22,6 +22,7 @@ from config import (
     MIROFISH_ENABLED, MIROFISH_MIN_CONFIDENCE,
     MOMENTUM_RISK_PER_TRADE, MOMENTUM_MIN_MOVE, MOMENTUM_ENTRY_SECONDS,
     MOMENTUM_PROFIT_TARGET, MOMENTUM_STOP_LOSS, MOMENTUM_EXIT_BEFORE_CLOSE,
+    MOMENTUM_VALUE_EDGE,
 )
 from feeds.binance_ws import BtcSnapshot
 from feeds.indicators import IndicatorSet
@@ -428,19 +429,38 @@ class MomentumEngine:
         if self._bet_placed_this_window:
             return None
 
-        elapsed = time.time() - self._window_start_ts
-        if elapsed > MOMENTUM_ENTRY_SECONDS:
-            return None
-
         ref = snap.mark_price if snap.mark_price > 0 else snap.price
         if self._window_open_price <= 0:
             return None
 
-        move = (ref - self._window_open_price) / self._window_open_price
-        if abs(move) < MOMENTUM_MIN_MOVE:
+        move     = (ref - self._window_open_price) / self._window_open_price
+        fair_yes = _fair_yes_from_mark(snap)        # chart-implied P(up)
+        fair_no  = 1.0 - fair_yes
+        elapsed  = time.time() - self._window_start_ts
+
+        go_up: Optional[bool] = None
+        trigger = ""
+
+        # ── path 1: early momentum bet ────────────────────────────────────────
+        if elapsed <= MOMENTUM_ENTRY_SECONDS and abs(move) >= MOMENTUM_MIN_MOVE:
+            go_up   = move > 0
+            trigger = f"momentum {move:+.3%}"
+
+        # ── path 2: value bet — a side trading below chart fair value ──────────
+        #    (active for the whole window, not just the first 60s)
+        else:
+            yes_disc = fair_yes - market.yes_ask    # how cheap YES is vs fair
+            no_disc  = fair_no  - market.no_ask
+            if yes_disc >= MOMENTUM_VALUE_EDGE and yes_disc >= no_disc:
+                go_up   = True
+                trigger = f"value YES {market.yes_ask:.2f} vs fair {fair_yes:.2f}"
+            elif no_disc >= MOMENTUM_VALUE_EDGE:
+                go_up   = False
+                trigger = f"value NO {market.no_ask:.2f} vs fair {fair_no:.2f}"
+
+        if go_up is None:
             return None
 
-        go_up      = move > 0
         token_id   = market.yes_token_id if go_up else market.no_token_id
         ask_price  = market.yes_ask      if go_up else market.no_ask
         side_label = "UP" if go_up else "DOWN"
@@ -473,9 +493,8 @@ class MomentumEngine:
             )
 
         return (
-            f"MOMENTUM {side_label}  move={move:+.3%} "
-            f"@ {ask_price:.3f}  ${size_usd:.2f}  "
-            f"{'OK TP={:.0%} SL={:.0%}'.format(MOMENTUM_PROFIT_TARGET, abs(MOMENTUM_STOP_LOSS)) if order_id else 'FAILED'}"
+            f"BET {side_label} [{trigger}] @ {ask_price:.3f}  ${size_usd:.2f}  "
+            f"{'OK' if order_id else 'FAILED'}"
         )
 
     async def _monitor(
