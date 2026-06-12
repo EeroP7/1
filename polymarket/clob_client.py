@@ -81,6 +81,7 @@ class PolymarketClient:
         self._market_end_ts: float = 0.0
         self._loop = asyncio.get_event_loop()
         self._open_positions: dict[str, OpenPosition] = {}
+        self.last_error: str = ""
 
     # ── market discovery ──────────────────────────────────────────────────────
 
@@ -233,8 +234,15 @@ class PolymarketClient:
             resp = await self._run(
                 self._client.post_order, signed_order, order_type
             )
-            return resp.get("orderID")
-        except Exception:
+            order_id = resp.get("orderID")
+            if not order_id:
+                # API accepted the request but rejected the order — capture why
+                self.last_error = str(
+                    resp.get("errorMsg") or resp.get("error") or resp
+                )[:120]
+            return order_id
+        except Exception as exc:
+            self.last_error = f"{type(exc).__name__}: {exc}"[:120]
             return None
 
     async def cancel_order(self, order_id: str) -> bool:

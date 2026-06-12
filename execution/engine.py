@@ -521,9 +521,10 @@ class MomentumEngine:
             )
 
         mult_note = f" x{mult:.2g}" if mult != 1.0 else ""
+        outcome_note = "OK" if order_id else f"FAILED — {self._clob.last_error}"
         return (
             f"BET {side_label} [{trigger}] @ {ask_price:.3f}  ${size_usd:.2f}{mult_note}  "
-            f"{'OK' if order_id else 'FAILED'}"
+            f"{outcome_note}"
         )
 
     async def _monitor(
