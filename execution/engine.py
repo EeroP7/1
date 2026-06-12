@@ -457,7 +457,7 @@ class MomentumEngine:
 
         # ── path 2: value bet — a side trading below chart fair value ──────────
         #    (active for the whole window, not just the first 60s)
-        else:
+        elif elapsed <= MOMENTUM_ENTRY_SECONDS:
             yes_disc = fair_yes - market.yes_ask    # how cheap YES is vs fair
             no_disc  = fair_no  - market.no_ask
             if yes_disc >= MOMENTUM_VALUE_EDGE and yes_disc >= no_disc:
@@ -468,6 +468,13 @@ class MomentumEngine:
                 go_up   = False
                 kind    = "value"
                 trigger = f"value NO {market.no_ask:.2f} vs fair {fair_no:.2f}"
+
+        # ── path 3: directional fallback — fire on whatever direction BTC moved
+        #    if we reach 180s into the window and still haven't bet
+        elif elapsed >= 180:
+            go_up   = move >= 0          # even flat → bet UP (small positive bias)
+            kind    = "fallback"
+            trigger = f"fallback {move:+.3%} @{elapsed:.0f}s"
 
         if go_up is None:
             return None

@@ -60,8 +60,8 @@ MIROFISH_LLM_API_KEY   = os.getenv("LLM_API_KEY", "")   # same key as MiroFish .
 # Fires every ~5 minutes regardless of force-graph convergence.
 MOMENTUM_ENABLED        = os.getenv("MOMENTUM_ENABLED", "true").lower() == "true"
 MOMENTUM_RISK_PER_TRADE = float(os.getenv("MOMENTUM_RISK_PER_TRADE", "0.02"))   # 2% of balance per bet
-MOMENTUM_MIN_MOVE       = float(os.getenv("MOMENTUM_MIN_MOVE", "0.0003"))        # min 0.03% mark move to bet
-MOMENTUM_ENTRY_SECONDS  = int(os.getenv("MOMENTUM_ENTRY_SECONDS", "60"))         # bet within first N sec of window
+MOMENTUM_MIN_MOVE       = float(os.getenv("MOMENTUM_MIN_MOVE", "0.0001"))        # min 0.01% mark move to bet
+MOMENTUM_ENTRY_SECONDS  = int(os.getenv("MOMENTUM_ENTRY_SECONDS", "240"))        # bet within first N sec of window
 MOMENTUM_PROFIT_TARGET  = float(os.getenv("MOMENTUM_PROFIT_TARGET", "0.15"))     # sell when position up 15%
 MOMENTUM_STOP_LOSS      = float(os.getenv("MOMENTUM_STOP_LOSS", "-0.20"))        # cut loss at -20%
 MOMENTUM_EXIT_BEFORE_CLOSE = int(os.getenv("MOMENTUM_EXIT_BEFORE_CLOSE", "30")) # force-exit N sec before window ends
@@ -69,7 +69,7 @@ MOMENTUM_EXIT_BEFORE_CLOSE = int(os.getenv("MOMENTUM_EXIT_BEFORE_CLOSE", "30")) 
 # Value entry: buy a side when its CLOB price is this far BELOW the chart-implied
 # fair value (e.g. 0.06 = the cheap side is undervalued by 6 cents). Fires any
 # time in the window, giving a second entry path beyond the early momentum bet.
-MOMENTUM_VALUE_EDGE     = float(os.getenv("MOMENTUM_VALUE_EDGE", "0.06"))
+MOMENTUM_VALUE_EDGE     = float(os.getenv("MOMENTUM_VALUE_EDGE", "0.03"))
 
 POLY_DATA_API          = "https://data-api.polymarket.com"
 COPY_ENABLED           = os.getenv("COPY_ENABLED", "true").lower() == "true"
