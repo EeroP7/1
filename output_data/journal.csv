@@ -29,3 +29,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale,
 2026-06-12,MU,3,2.265,995.87,823.32,86.28,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-06-12,WDC,4,2.189,529.29,457.44,35.93,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-06-12,MXL,5,2.1871,81.09,58.38,11.35,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-06-15,SNDK,1,2.4773,1980.1,1670.1,155.0,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-06-15,TNGX,2,2.4107,30.94,25.73,2.6,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-06-15,AEHR,3,2.2796,108.47,81.61,13.43,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-06-15,WDC,4,2.2696,562.92,486.56,38.18,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-06-15,CLYM,5,2.2564,11.44,9.41,1.01,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
