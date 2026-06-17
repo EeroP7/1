@@ -226,10 +226,12 @@ def main() -> None:
     if args.news_screen:
         from news.scanner import fetch_news
         from news.analyst import screen_picks, apply_screening
+        from output.picks import _earnings_flag
 
         logger.info("Screening picks against recent news...")
         news = fetch_news([p.ticker for p in sized])
-        screens = screen_picks(news)
+        earnings_flags = {p.ticker: _earnings_flag(p.ticker, today) for p in sized}
+        screens = screen_picks(news, earnings_flags=earnings_flags)
         sized, vetoed = apply_screening(sized, screens)
         for v in vetoed:
             s = screens[v.ticker]

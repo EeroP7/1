@@ -108,18 +108,33 @@ CRITICAL RULES:
 def screen_picks(
     news_by_ticker: "dict[str, list[NewsItem]]",
     model_rationale: dict[str, str] | None = None,
+    earnings_flags: dict[str, str] | None = None,
 ) -> dict[str, ScreenResult]:
-    """Full due-diligence screen for each ticker. Returns {ticker: ScreenResult}."""
+    """Full due-diligence screen for each ticker. Returns {ticker: ScreenResult}.
+
+    earnings_flags: {ticker: earnings_flag_string} from output.picks._earnings_flag.
+    If a ticker has an imminent earnings flag, it is auto-CAUTION'd even without an API key.
+    """
     api_key = os.getenv("ANTHROPIC_API_KEY")
+    earnings_flags = earnings_flags or {}
+
     if not api_key:
         logger.warning(
             "ANTHROPIC_API_KEY not set — AI due diligence SKIPPED. "
-            "All picks pass through unscreened."
+            "All picks pass through unscreened (earnings flags still applied)."
         )
-        return {
-            t: ScreenResult(t, "CLEAR", "unscreened (no API key)", False, screened=False)
-            for t in news_by_ticker
-        }
+        results = {}
+        for t in news_by_ticker:
+            flag = earnings_flags.get(t, "")
+            if "EARNINGS" in flag:
+                results[t] = ScreenResult(
+                    t, "CAUTION", f"earnings imminent: {flag}", True, screened=False,
+                    event_risk_score=0,
+                )
+                logger.warning("Auto-CAUTION %s — %s", t, flag)
+            else:
+                results[t] = ScreenResult(t, "CLEAR", "unscreened (no API key)", False, screened=False)
+        return results
 
     import anthropic
     client = anthropic.Anthropic()
@@ -127,6 +142,7 @@ def screen_picks(
 
     for ticker, items in news_by_ticker.items():
         rationale = (model_rationale or {}).get(ticker, "momentum/trend signals")
+        earnings_note = earnings_flags.get(ticker, "no earnings within 10 days")
 
         headlines_block = ""
         if items:
@@ -140,7 +156,8 @@ def screen_picks(
 
         user_msg = (
             f"Ticker: {ticker}\n"
-            f"Why the model picked it: {rationale}\n\n"
+            f"Why the model picked it: {rationale}\n"
+            f"Earnings calendar: {earnings_note}\n\n"
             f"Recent news (last 7 days):\n{headlines_block}"
         )
 
