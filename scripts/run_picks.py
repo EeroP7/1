@@ -251,7 +251,7 @@ def main() -> None:
         }
 
     # --- Output ---
-    from output.picks import print_picks, write_picks, send_alert
+    from output.picks import print_picks, write_picks, send_alert, send_email_alert
 
     print_picks(sized, as_of=today, feature_rows=feature_rows)
 
@@ -295,6 +295,15 @@ def main() -> None:
 
     write_picks(sized, as_of=today, feature_rows=feature_rows, screens=screens)
     send_alert(sized, as_of=today)
+    send_email_alert(
+        picks=sized,
+        as_of=today,
+        equity=acct["equity"],
+        sold=closed,
+        order_results=results,
+        feature_rows=feature_rows,
+        screens=screens,
+    )
     print(f"\n✅ Placed {len(results) - len(errors)}/{len(results)} orders in "
           f"{'LIVE' if args.live else 'PAPER'} account.\n")
 
