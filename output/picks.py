@@ -223,3 +223,109 @@ def send_alert(picks: "list[SizedPick]", as_of: date | None = None) -> None:
         resp.raise_for_status()
     except Exception as exc:
         logger.warning("Alert webhook failed: %s", exc)
+
+
+def send_email_alert(
+    picks: "list[SizedPick]",
+    as_of: "date | None" = None,
+    equity: float | None = None,
+    sold: list[str] | None = None,
+    order_results: list | None = None,
+    feature_rows: dict | None = None,
+    screens: dict | None = None,
+) -> None:
+    """Send a daily trade signal email via Gmail SMTP.
+
+    Required env vars (add as GitHub Secrets):
+        GMAIL_USER        — your Gmail address (e.g. eerop20@gmail.com)
+        GMAIL_APP_PASSWORD — Gmail app password (not your login password)
+
+    Optional:
+        ALERT_EMAIL       — recipient address; defaults to GMAIL_USER
+    """
+    sender = os.getenv("GMAIL_USER", "")
+    password = os.getenv("GMAIL_APP_PASSWORD", "")
+    if not sender or not password:
+        logger.info("GMAIL_USER/GMAIL_APP_PASSWORD not set — email alert skipped.")
+        return
+
+    recipient = os.getenv("ALERT_EMAIL", sender)
+    as_of = as_of or date.today()
+    sold = sold or []
+    order_results = order_results or []
+    feature_rows = feature_rows or {}
+    screens = screens or {}
+
+    # ── build plain-text body ──────────────────────────────────────────────
+    lines: list[str] = []
+    lines.append(f"DAILY TRADE SIGNAL — {as_of}")
+    lines.append("=" * 50)
+
+    if equity is not None:
+        lines.append(f"Account equity: ${equity:,.2f}  (paper)")
+    lines.append("")
+
+    # Sells
+    if sold:
+        lines.append(f"SOLD (rotated out):")
+        for ticker in sold:
+            lines.append(f"  ✖  {ticker}")
+        lines.append("")
+
+    # Buys / adjustments
+    lines.append("CURRENT POSITIONS (fills at next open):")
+    for pick in picks:
+        earnings = _earnings_flag(pick.ticker, as_of)
+        screen = screens.get(pick.ticker)
+        verdict_tag = ""
+        if screen and screen.verdict == "CAUTION":
+            verdict_tag = "  ⚠️ CAUTION (weight halved)"
+        elif screen and screen.verdict == "VETO":
+            verdict_tag = "  ⛔ VETOED"
+
+        # find matching order result
+        order_tag = ""
+        for r in order_results:
+            if r.ticker == pick.ticker:
+                if r.error:
+                    order_tag = "  ❌ ORDER FAILED"
+                elif hasattr(r, "side"):
+                    order_tag = f"  → {r.side.upper()}"
+                break
+
+        lines.append(
+            f"  #{pick.rank}  {pick.ticker:6s}"
+            f"  entry ~${pick.entry_ref:.2f}"
+            f"  stop ${pick.stop:.2f}"
+            f"  weight {pick.weight:.0%}"
+            f"{order_tag}{verdict_tag}"
+        )
+        if "EARNINGS" in earnings:
+            lines.append(f"         ⚠️  {earnings}")
+        rationale = _build_rationale(pick.ticker, pick.score, feature_rows.get(pick.ticker))
+        lines.append(f"         why: {rationale}")
+
+    lines.append("")
+    lines.append("─" * 50)
+    lines.append("Stops are ATR-based journal levels, not live Alpaca orders.")
+    lines.append("This is paper trading — no real money at risk.")
+
+    body = "\n".join(lines)
+
+    # ── send via Gmail SMTP ────────────────────────────────────────────────
+    import smtplib
+    from email.message import EmailMessage
+
+    msg = EmailMessage()
+    msg["Subject"] = f"📈 Trade Signal {as_of} — {len(picks)} positions"
+    msg["From"] = sender
+    msg["To"] = recipient
+    msg.set_content(body)
+
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=15) as smtp:
+            smtp.login(sender, password)
+            smtp.send_message(msg)
+        logger.info("Email alert sent to %s", recipient)
+    except Exception as exc:
+        logger.warning("Email alert failed: %s", exc)
