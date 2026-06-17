@@ -41,13 +41,35 @@ JOURNAL_FIELDS = PICKS_FIELDS + [
 ]
 
 _EARNINGS_WITHIN = 10   # flag if earnings within this many calendar days
+_earnings_cache: dict[str, list] = {}  # ticker → list[date]
+
+
+def _fetch_earnings_dates(ticker: str) -> list:
+    """Fetch upcoming earnings dates from yfinance. Returns [] on any failure."""
+    if ticker in _earnings_cache:
+        return _earnings_cache[ticker]
+    try:
+        import yfinance as yf
+        cal = yf.Ticker(ticker).calendar
+        dates = cal.get("Earnings Date", []) if isinstance(cal, dict) else []
+        _earnings_cache[ticker] = list(dates)
+        return _earnings_cache[ticker]
+    except Exception as exc:
+        logger.debug("Could not fetch earnings calendar for %s: %s", ticker, exc)
+        _earnings_cache[ticker] = []
+        return []
 
 
 def _earnings_flag(ticker: str, as_of: date) -> str:
-    """
-    Placeholder — returns 'no earnings <10d' always.
-    Integrate an earnings calendar API (e.g. Alpaca, Benzinga) to make this real.
-    """
+    """Returns earnings date string if within _EARNINGS_WITHIN days, else 'no earnings <Nd'."""
+    from datetime import timedelta
+    dates = _fetch_earnings_dates(ticker)
+    cutoff = as_of + timedelta(days=_EARNINGS_WITHIN)
+    upcoming = [d for d in dates if isinstance(d, date) and as_of <= d <= cutoff]
+    if upcoming:
+        nearest = min(upcoming)
+        days_away = (nearest - as_of).days
+        return f"⚠️ EARNINGS {nearest} ({days_away}d)"
     return f"no earnings <{_EARNINGS_WITHIN}d"
 
 

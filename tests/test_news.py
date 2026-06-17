@@ -71,3 +71,41 @@ def test_apply_screening_missing_screen_defaults_clear():
     picks = [_pick("AAPL")]
     kept, vetoed = apply_screening(picks, {})
     assert len(kept) == 1 and not vetoed
+
+
+def test_earnings_flag_no_upcoming(monkeypatch):
+    """When yfinance returns no earnings within 10d, flag says 'no earnings <10d'."""
+    from datetime import date
+    import output.picks as op
+    op._earnings_cache.clear()
+    monkeypatch.setattr("output.picks._fetch_earnings_dates", lambda t: [])
+    flag = op._earnings_flag("FAKE", date(2026, 6, 17))
+    assert "no earnings" in flag
+
+
+def test_earnings_flag_imminent(monkeypatch):
+    """When yfinance returns an earnings date within 10d, flag warns."""
+    from datetime import date
+    import output.picks as op
+    op._earnings_cache.clear()
+    monkeypatch.setattr(
+        "output.picks._fetch_earnings_dates",
+        lambda t: [date(2026, 6, 24)],
+    )
+    flag = op._earnings_flag("MU", date(2026, 6, 17))
+    assert "EARNINGS" in flag
+    assert "7d" in flag
+
+
+def test_screen_picks_no_api_key_auto_cautions_earnings():
+    """Without API key, picks with imminent earnings get CAUTION not CLEAR."""
+    import os
+    env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
+    with mock.patch.dict(os.environ, env, clear=True):
+        screens = screen_picks(
+            {"MU": [], "AAPL": []},
+            earnings_flags={"MU": "⚠️ EARNINGS 2026-06-24 (7d)", "AAPL": "no earnings <10d"},
+        )
+    assert screens["MU"].verdict == "CAUTION"
+    assert screens["MU"].earnings_risk is True
+    assert screens["AAPL"].verdict == "CLEAR"
