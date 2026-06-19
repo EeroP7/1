@@ -29,3 +29,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-06-18,TNGX,3,2.0824,32.29,26.53,2.88,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
 2026-06-18,AEHR,4,2.0511,112.62,83.29,14.67,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
 2026-06-18,RXT,5,2.0036,7.53,5.57,0.98,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-06-19,WDC,1,2.3832,746.23,642.4,51.92,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
+2026-06-19,SNDK,2,2.1244,2184.75,1846.56,169.1,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-06-19,BE,3,2.0642,328.91,276.3,26.3,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
+2026-06-19,AEHR,4,2.0088,115.3,86.15,14.58,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-06-19,MU,5,1.9902,1133.99,950.66,91.67,0.1,Unknown,⚠️ EARNINGS 2026-06-24 (5d),3-mo momentum + 6-mo momentum
