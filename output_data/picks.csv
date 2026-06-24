@@ -44,3 +44,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-06-23,RFIL,3,2.0167,21.5,17.26,2.12,0.2,Unknown,no earnings <10d,6-mo momentum + rising volume
 2026-06-23,SNDK,4,1.9757,2273.73,1928.14,172.8,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
 2026-06-23,ORKA,5,1.8886,85.38,75.11,5.14,0.2,Unknown,no earnings <10d,6-mo momentum + mean-reversion
+2026-06-24,WDC,1,2.1957,670.75,556.96,56.9,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
+2026-06-24,BRUNW,2,1.9575,23.43,14.68,4.37,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-06-24,BE,3,1.9138,321.98,266.9,27.54,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
+2026-06-24,RFIL,4,1.8987,21.12,16.73,2.2,0.2,Unknown,no earnings <10d,6-mo momentum + rising volume
+2026-06-24,ALOT,5,1.7573,28.4,25.24,1.58,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
