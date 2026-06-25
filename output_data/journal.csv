@@ -49,3 +49,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale,
 2026-06-24,BE,3,1.9138,321.98,266.9,27.54,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-06-24,RFIL,4,1.8987,21.12,16.73,2.2,0.2,Unknown,no earnings <10d,6-mo momentum + rising volume,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-06-24,ALOT,5,1.7573,28.4,25.24,1.58,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-06-25,BRUNW,1,2.1419,22.05,13.84,4.1,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-06-25,WDC,2,2.0584,643.83,527.33,58.25,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-06-25,BE,3,2.0247,326.19,269.6,28.3,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-06-25,SNDK,4,1.8952,1914.46,1530.5,191.98,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-06-25,CLYM,5,1.8154,12.75,10.79,0.98,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
