@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>The Lumora Daily Planner</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { margin: 0; padding: 0; font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; color: #1c1b1a; }
+  .page {
+    width: 210mm; height: 297mm; padding: 18mm 16mm; page-break-after: always;
+    position: relative; background: #faf6f0;
+  }
+  .page:last-child { page-break-after: auto; }
+  h1, h2, h3 { font-family: "Iowan Old Style", Palatino, Georgia, serif; font-weight: 600; margin: 0; }
+  .eyebrow { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: #c2683f; font-weight: 700; }
+  .muted { color: #6b6760; }
+  .rule { height: 1px; background: #1c1b1a1a; border: 0; margin: 8px 0; }
+  .brand { display:flex; align-items:center; gap:6px; font-family:"Iowan Old Style",Palatino,Georgia,serif; font-size:15px; font-weight:600;}
+  .dot { width:10px;height:10px;border-radius:50%;background:#c2683f;display:inline-block;}
+  .footer { position:absolute; bottom:10mm; left:16mm; right:16mm; display:flex; justify-content:space-between; font-size:9px; color:#9a958c; }
+  .line { border-bottom: 1px solid #1c1b1a26; height: 26px; }
+  .box { border:1px solid #1c1b1a26; border-radius:8px; }
+  .check { width:14px;height:14px;border:1.5px solid #c2683f;border-radius:4px;display:inline-block;margin-right:8px;vertical-align:middle;}
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+  .grid7 { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+  .tile { background:#fff; border:1px solid #1c1b1a14; border-radius:10px; padding:12px; }
+  .pill { display:inline-block; background:#c2683f15; color:#c2683f; padding:3px 10px; border-radius:999px; font-size:10px; font-weight:700; }
+
+  /* Cover */
+  .cover { background: #c2683f; color:#faf6f0; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
+  .cover h1 { font-size:46px; line-height:1.05; color:#faf6f0; }
+  .cover .sun { font-size:90px; margin-bottom:10px; }
+  .cover .tag { margin-top:14px; letter-spacing:4px; text-transform:uppercase; font-size:11px; opacity:.9;}
+</style>
+</head>
+<body>
+
+  <!-- COVER -->
+  <section class="page cover">
+    <div class="sun">✺</div>
+    <h1>The Lumora<br/>Daily Planner</h1>
+    <div class="tag">Plan less · Finish more · Feel calmer</div>
+    <div style="margin-top:40px; font-size:12px; opacity:.85;">A printable starter from the Lumora Life System</div>
+  </section>
+
+  <!-- HOW TO USE -->
+  <section class="page">
+    <div class="brand"><span class="dot"></span> lumora</div>
+    <hr class="rule"/>
+    <p class="eyebrow" style="margin-top:18px;">Start here</p>
+    <h1 style="font-size:30px; margin-top:6px;">The 3-Priority Method</h1>
+    <p class="muted" style="max-width:150mm; line-height:1.6; margin-top:12px;">
+      Most planners fail because they ask too much. Lumora asks for three things.
+      Each day, choose the three priorities that — if completed — would make today a win.
+      Three is small enough to finish, and finishing is what brings you back tomorrow.
+    </p>
+
+    <div class="grid3" style="margin-top:24px;">
+      <div class="tile"><div class="pill">01</div><h3 style="margin-top:10px; font-size:15px;">Choose three</h3><p class="muted" style="font-size:11px; line-height:1.5;">Each morning, write your three priorities. Everything else goes on the "later" list.</p></div>
+      <div class="tile"><div class="pill">02</div><h3 style="margin-top:10px; font-size:15px;">Protect your time</h3><p class="muted" style="font-size:11px; line-height:1.5;">Block time for priority one before the day fills up with everyone else's requests.</p></div>
+      <div class="tile"><div class="pill">03</div><h3 style="margin-top:10px; font-size:15px;">Close the day</h3><p class="muted" style="font-size:11px; line-height:1.5;">Tick what's done, note one win, and carry the rest forward without guilt.</p></div>
+    </div>
+
+    <p class="eyebrow" style="margin-top:30px;">The weekly rhythm</p>
+    <p class="muted" style="max-width:150mm; line-height:1.6; margin-top:8px;">
+      Use the Weekly Plan each Sunday to set three weekly priorities. Each day's three
+      priorities should ladder up to them. Once a month, fill the calendar and habit tracker.
+      That's the whole system. Print what you need, as often as you need it.
+    </p>
+    <div class="footer"><span>The Lumora Daily Planner</span><span>lumora.co</span></div>
+  </section>
+
+  <!-- DAILY PAGE -->
+  <section class="page">
+    <div class="brand"><span class="dot"></span> lumora</div>
+    <hr class="rule"/>
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:14px;">
+      <div><p class="eyebrow">Daily plan</p><h1 style="font-size:30px;">Today</h1></div>
+      <div style="text-align:right;" class="muted">
+        <div style="font-size:10px;">DATE</div>
+        <div class="box" style="width:55mm; height:26px; margin-top:4px;"></div>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:18px;">
+      <div>
+        <p class="eyebrow">Today's 3 priorities</p>
+        <div class="tile" style="margin-top:8px;">
+          <div style="margin:10px 0;"><span class="check"></span><span style="border-bottom:1px solid #1c1b1a26; display:inline-block; width:60mm;">&nbsp;</span></div>
+          <div style="margin:10px 0;"><span class="check"></span><span style="border-bottom:1px solid #1c1b1a26; display:inline-block; width:60mm;">&nbsp;</span></div>
+          <div style="margin:10px 0;"><span class="check"></span><span style="border-bottom:1px solid #1c1b1a26; display:inline-block; width:60mm;">&nbsp;</span></div>
+        </div>
+        <p class="eyebrow" style="margin-top:18px;">Everything else (later list)</p>
+        <div class="line" style="margin-top:10px;"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div>
+      </div>
+      <div>
+        <p class="eyebrow">Time blocks</p>
+        <div class="box" style="margin-top:8px; padding:8px 12px;">
+          <!-- hourly rows -->
+          <div style="display:flex; gap:10px; padding:6px 0; border-bottom:1px solid #1c1b1a12;"><span class="muted" style="width:34px; font-size:10px;">7</span><span style="flex:1;"></span></div>
+          <div style="display:flex; gap:10px; padding:6px 0; border-bottom:1px solid #1c1b1a12;"><span class="muted" style="width:34px; font-size:10px;">8</span><span style="flex:1;"></span></div>
+          <div style="display:flex; gap:10px; padding:6px 0; border-bottom:1px solid #1c1b1a12;"><span class="muted" style="width:34px; font-size:10px;">9</span><span style="flex:1;"></span></div>
+          <div style="display:flex; gap:10px; padding:6px 0; border-bottom:1px solid #1c1b1a12;"><span class="muted" style="width:34px; font-size:10px;">10</span><span style="flex:1;"></span></div>
+          <div style="display:flex; gap:10px; padding:6px 0; border-bottom:1px solid #1c1b1a12;"><span class="muted" style="width:34px; font-size:10px;">11</span><span style="flex:1;"></span></div>
+          <div style="display:flex; gap:10px; padding:6px 0; border-bottom:1px solid #1c1b1a12;"><span class="muted" style="width:34px; font-size:10px;">12</span><span style="flex:1;"></span></div>
+          <div style="display:flex; gap:10px; padding:6px 0; border-bottom:1px solid #1c1b1a12;"><span class="muted" style="width:34px; font-size:10px;">1</span><span style="flex:1;"></span></div>
+          <div style="display:flex; gap:10px; padding:6px 0; border-bottom:1px solid #1c1b1a12;"><span class="muted" style="width:34px; font-size:10px;">2</span><span style="flex:1;"></span></div>
+          <div style="display:flex; gap:10px; padding:6px 0; border-bottom:1px solid #1c1b1a12;"><span class="muted" style="width:34px; font-size:10px;">3</span><span style="flex:1;"></span></div>
+          <div style="display:flex; gap:10px; padding:6px 0; border-bottom:1px solid #1c1b1a12;"><span class="muted" style="width:34px; font-size:10px;">4</span><span style="flex:1;"></span></div>
+          <div style="display:flex; gap:10px; padding:6px 0; border-bottom:1px solid #1c1b1a12;"><span class="muted" style="width:34px; font-size:10px;">5</span><span style="flex:1;"></span></div>
+          <div style="display:flex; gap:10px; padding:6px 0;"><span class="muted" style="width:34px; font-size:10px;">6</span><span style="flex:1;"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid3" style="margin-top:18px;">
+      <div class="tile"><p class="eyebrow">Move &amp; nourish</p><div style="margin-top:8px;"><span class="check"></span>Movement</div><div style="margin-top:8px;"><span class="check"></span>Water</div><div style="margin-top:8px;"><span class="check"></span>Real food</div></div>
+      <div class="tile"><p class="eyebrow">One win today</p><div class="line" style="margin-top:14px;"></div></div>
+      <div class="tile"><p class="eyebrow">Grateful for</p><div class="line" style="margin-top:14px;"></div></div>
+    </div>
+    <div class="footer"><span>Daily Plan</span><span>lumora.co</span></div>
+  </section>
+
+  <!-- WEEKLY PAGE -->
+  <section class="page">
+    <div class="brand"><span class="dot"></span> lumora</div>
+    <hr class="rule"/>
+    <div style="margin-top:14px;"><p class="eyebrow">Weekly plan</p><h1 style="font-size:30px;">This week</h1></div>
+
+    <p class="eyebrow" style="margin-top:16px;">This week's 3 priorities</p>
+    <div class="grid3" style="margin-top:8px;">
+      <div class="tile" style="height:40px;"></div>
+      <div class="tile" style="height:40px;"></div>
+      <div class="tile" style="height:40px;"></div>
+    </div>
+
+    <div class="grid7" style="margin-top:18px;">
+      <div class="tile" style="height:120px;"><div class="muted" style="font-size:10px; font-weight:700;">MON</div></div>
+      <div class="tile" style="height:120px;"><div class="muted" style="font-size:10px; font-weight:700;">TUE</div></div>
+      <div class="tile" style="height:120px;"><div class="muted" style="font-size:10px; font-weight:700;">WED</div></div>
+      <div class="tile" style="height:120px;"><div class="muted" style="font-size:10px; font-weight:700;">THU</div></div>
+      <div class="tile" style="height:120px;"><div class="muted" style="font-size:10px; font-weight:700;">FRI</div></div>
+      <div class="tile" style="height:120px;"><div class="muted" style="font-size:10px; font-weight:700;">SAT</div></div>
+      <div class="tile" style="height:120px;"><div class="muted" style="font-size:10px; font-weight:700;">SUN</div></div>
+    </div>
+
+    <div class="grid2" style="margin-top:18px;">
+      <div class="tile"><p class="eyebrow">What went well last week</p><div class="line" style="margin-top:12px;"></div><div class="line"></div></div>
+      <div class="tile"><p class="eyebrow">What to adjust</p><div class="line" style="margin-top:12px;"></div><div class="line"></div></div>
+    </div>
+    <div class="footer"><span>Weekly Plan</span><span>lumora.co</span></div>
+  </section>
+
+  <!-- MONTHLY CALENDAR -->
+  <section class="page">
+    <div class="brand"><span class="dot"></span> lumora</div>
+    <hr class="rule"/>
+    <div style="margin-top:14px;"><p class="eyebrow">Monthly view</p><h1 style="font-size:30px;">Month at a glance</h1></div>
+    <div class="grid7" style="margin-top:16px; gap:0; border:1px solid #1c1b1a26; border-radius:8px; overflow:hidden;">
+      <!-- header -->
+      <div style="background:#efe7db; font-size:10px; font-weight:700; padding:6px; text-align:center;">MON</div>
+      <div style="background:#efe7db; font-size:10px; font-weight:700; padding:6px; text-align:center;">TUE</div>
+      <div style="background:#efe7db; font-size:10px; font-weight:700; padding:6px; text-align:center;">WED</div>
+      <div style="background:#efe7db; font-size:10px; font-weight:700; padding:6px; text-align:center;">THU</div>
+      <div style="background:#efe7db; font-size:10px; font-weight:700; padding:6px; text-align:center;">FRI</div>
+      <div style="background:#efe7db; font-size:10px; font-weight:700; padding:6px; text-align:center;">SAT</div>
+      <div style="background:#efe7db; font-size:10px; font-weight:700; padding:6px; text-align:center;">SUN</div>
+    </div>
+    <div class="grid7" style="margin-top:0; gap:0; border-left:1px solid #1c1b1a26; border-right:1px solid #1c1b1a26; border-bottom:1px solid #1c1b1a26; border-radius:0 0 8px 8px; overflow:hidden;">
+      <!-- 35 empty day cells -->
+      <!-- generated rows -->
+      <!-- row template: 7 cells, repeated 5 times -->
+      <!-- using script-free static cells -->
+      <!-- 35 cells -->
+      <!-- to keep file readable they're listed below -->
+      <div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14;"></div>
+      <div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14;"></div>
+      <div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14;"></div>
+      <div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14;"></div>
+      <div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14; border-right:1px solid #1c1b1a14;"></div><div style="height:34px; border-top:1px solid #1c1b1a14;"></div>
+    </div>
+    <div class="grid2" style="margin-top:18px;">
+      <div class="tile"><p class="eyebrow">Monthly focus</p><div class="line" style="margin-top:12px;"></div></div>
+      <div class="tile"><p class="eyebrow">Don't forget</p><div class="line" style="margin-top:12px;"></div></div>
+    </div>
+    <div class="footer"><span>Monthly View</span><span>lumora.co</span></div>
+  </section>
+
+  <!-- HABIT TRACKER -->
+  <section class="page">
+    <div class="brand"><span class="dot"></span> lumora</div>
+    <hr class="rule"/>
+    <div style="margin-top:14px;"><p class="eyebrow">Habit tracker</p><h1 style="font-size:30px;">Small steps, compounded</h1></div>
+    <p class="muted" style="margin-top:10px; font-size:12px;">List up to six habits. Shade a box each day you show up. Aim for progress, not perfection.</p>
+    <div class="box" style="margin-top:16px; padding:14px;">
+      <div style="display:flex; gap:6px; align-items:center; font-size:9px; color:#9a958c; padding-left:42mm;">
+        <!-- 31 day numbers -->
+        <div style="display:grid; grid-template-columns:repeat(31,1fr); gap:3px; flex:1;">
+          <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span>
+        </div>
+      </div>
+      <!-- 6 habit rows -->
+      <div style="display:flex; gap:6px; align-items:center; margin-top:10px;"><div style="width:42mm; border-bottom:1px solid #1c1b1a26; height:20px;"></div><div style="display:grid; grid-template-columns:repeat(31,1fr); gap:3px; flex:1;"></div></div>
+      <div style="display:flex; gap:6px; align-items:center; margin-top:14px;"><div style="width:42mm; border-bottom:1px solid #1c1b1a26; height:20px;"></div><div style="display:grid; grid-template-columns:repeat(31,1fr); gap:3px; flex:1;"></div></div>
+      <div style="display:flex; gap:6px; align-items:center; margin-top:14px;"><div style="width:42mm; border-bottom:1px solid #1c1b1a26; height:20px;"></div><div style="display:grid; grid-template-columns:repeat(31,1fr); gap:3px; flex:1;"></div></div>
+      <div style="display:flex; gap:6px; align-items:center; margin-top:14px;"><div style="width:42mm; border-bottom:1px solid #1c1b1a26; height:20px;"></div><div style="display:grid; grid-template-columns:repeat(31,1fr); gap:3px; flex:1;"></div></div>
+      <div style="display:flex; gap:6px; align-items:center; margin-top:14px;"><div style="width:42mm; border-bottom:1px solid #1c1b1a26; height:20px;"></div><div style="display:grid; grid-template-columns:repeat(31,1fr); gap:3px; flex:1;"></div></div>
+      <div style="display:flex; gap:6px; align-items:center; margin-top:14px;"><div style="width:42mm; border-bottom:1px solid #1c1b1a26; height:20px;"></div><div style="display:grid; grid-template-columns:repeat(31,1fr); gap:3px; flex:1;"></div></div>
+    </div>
+    <p class="eyebrow" style="margin-top:24px;">Habit stack</p>
+    <p class="muted" style="margin-top:6px; font-size:12px;">After I <span style="border-bottom:1px solid #1c1b1a40; padding:0 30px;"></span>, I will <span style="border-bottom:1px solid #1c1b1a40; padding:0 30px;"></span>.</p>
+    <div class="footer"><span>Habit Tracker</span><span>lumora.co</span></div>
+  </section>
+
+  <!-- GOALS PAGE -->
+  <section class="page">
+    <div class="brand"><span class="dot"></span> lumora</div>
+    <hr class="rule"/>
+    <div style="margin-top:14px;"><p class="eyebrow">12-week goals</p><h1 style="font-size:30px;">From someday to done</h1></div>
+    <p class="muted" style="margin-top:10px; font-size:12px;">Pick up to three goals for the next 12 weeks. Big enough to matter, small enough to finish.</p>
+
+    <div style="margin-top:16px;">
+      <div class="tile" style="margin-bottom:12px;">
+        <p class="eyebrow">Goal 01</p>
+        <div class="line" style="margin-top:8px;"></div>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <div style="flex:1;"><span class="muted" style="font-size:10px;">Why it matters</span><div class="line" style="margin-top:4px;"></div></div>
+          <div style="flex:1;"><span class="muted" style="font-size:10px;">First step this week</span><div class="line" style="margin-top:4px;"></div></div>
+        </div>
+      </div>
+      <div class="tile" style="margin-bottom:12px;">
+        <p class="eyebrow">Goal 02</p>
+        <div class="line" style="margin-top:8px;"></div>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <div style="flex:1;"><span class="muted" style="font-size:10px;">Why it matters</span><div class="line" style="margin-top:4px;"></div></div>
+          <div style="flex:1;"><span class="muted" style="font-size:10px;">First step this week</span><div class="line" style="margin-top:4px;"></div></div>
+        </div>
+      </div>
+      <div class="tile">
+        <p class="eyebrow">Goal 03</p>
+        <div class="line" style="margin-top:8px;"></div>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <div style="flex:1;"><span class="muted" style="font-size:10px;">Why it matters</span><div class="line" style="margin-top:4px;"></div></div>
+          <div style="flex:1;"><span class="muted" style="font-size:10px;">First step this week</span><div class="line" style="margin-top:4px;"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>12-Week Goals</span><span>lumora.co</span></div>
+  </section>
+
+  <!-- CLOSING -->
+  <section class="page cover">
+    <h1 style="font-size:34px;">You don't have to do<br/>everything. Just the<br/>next right thing.</h1>
+    <div class="tag" style="margin-top:24px;">Thank you for choosing Lumora · lumora.co</div>
+  </section>
+
+</body>
+</html>
