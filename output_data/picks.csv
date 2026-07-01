@@ -69,3 +69,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-06-30,SLS,3,1.8933,15.45,13.38,1.04,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
 2026-06-30,NVCT,4,1.8804,28.53,23.84,2.35,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
 2026-06-30,WDC,5,1.8745,651.88,517.45,67.21,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
+2026-07-01,VICR,1,2.2423,379.78,320.88,29.45,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
+2026-07-01,MXL,2,2.1806,128.03,107.41,10.31,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-07-01,BE,3,2.0797,302.7,237.32,32.69,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
+2026-07-01,SNDK,4,2.061,2273.73,1835.89,218.92,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-07-01,SLS,5,2.0547,14.76,12.42,1.17,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
