@@ -27,6 +27,22 @@
     });
   }
 
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* staggered reveal groups: children of [data-stagger] rise in sequence */
+  document.querySelectorAll('[data-stagger]').forEach(function (parent) {
+    Array.prototype.forEach.call(parent.children, function (child, i) {
+      child.classList.add('reveal');
+      child.style.transitionDelay = (i * 90) + 'ms';
+      child.addEventListener('transitionend', function clear(e) {
+        if (e.propertyName === 'opacity') {
+          child.style.transitionDelay = '';
+          child.removeEventListener('transitionend', clear);
+        }
+      });
+    });
+  });
+
   /* reveal on scroll */
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {
@@ -34,6 +50,56 @@
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
   document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+
+  /* count-up numbers */
+  function animateCount(el) {
+    var to = parseInt(el.dataset.to, 10);
+    function fmt(n) { return n.toLocaleString('en').replace(/,/g, ' '); }
+    if (reduced) { el.textContent = fmt(to); return; }
+    var t0 = null, dur = 1500;
+    function step(t) {
+      if (!t0) t0 = t;
+      var p = Math.min((t - t0) / dur, 1);
+      el.textContent = fmt(Math.round(to * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  var counts = document.querySelectorAll('.count');
+  if (counts.length) {
+    var cio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { animateCount(e.target); cio.unobserve(e.target); }
+      });
+    }, { threshold: 0.5 });
+    counts.forEach(function (el) {
+      if (!reduced) el.textContent = '0';
+      cio.observe(el);
+    });
+  }
+
+  /* hero blueprint: line-drawing entrance */
+  var heroSvg = document.querySelector('.hero-art svg');
+  if (heroSvg && !reduced && 'animate' in Element.prototype) {
+    var shapes = heroSvg.querySelectorAll('path,line,rect,circle');
+    var di = 0;
+    shapes.forEach(function (el) {
+      if (el.getAttribute('stroke') || el.closest('[stroke]')) {
+        el.setAttribute('pathLength', '1');
+        el.style.strokeDasharray = '1';
+        el.style.strokeDashoffset = '1';
+        el.animate(
+          [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }],
+          { duration: 1300, delay: 250 + di * 26, fill: 'forwards', easing: 'cubic-bezier(.22,.61,.24,1)' }
+        );
+        di++;
+      }
+    });
+    heroSvg.querySelectorAll('text').forEach(function (el, i) {
+      el.style.opacity = '0';
+      el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, delay: 1400 + i * 120, fill: 'forwards' });
+    });
+  }
 
   /* ---------- listings filter (kohteet.html) ---------- */
   var filterBar = document.getElementById('filters');
