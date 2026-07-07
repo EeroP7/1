@@ -79,3 +79,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-07-06,BE,3,1.9777,270.89,200.5,35.2,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
 2026-07-06,MXL,4,1.9659,93.12,68.92,12.1,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
 2026-07-06,MU,5,1.9286,975.41,762.1,106.66,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-07-07,CLYM,1,2.2103,13.27,11.36,0.96,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
+2026-07-07,SLS,2,2.0974,13.94,11.03,1.45,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-07-07,MXL,3,2.0471,95.68,70.84,12.42,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-07-07,BE,4,1.9553,295.05,223.19,35.93,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
+2026-07-07,MU,5,1.9476,984.75,772.7,106.02,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
