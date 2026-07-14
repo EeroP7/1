@@ -94,3 +94,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale,
 2026-07-13,PENG,3,2.1166,78.35,59.29,9.53,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-07-13,BAND,4,2.0063,75.48,65.13,5.17,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-07-13,SNDK,5,1.9949,1915.92,1438.11,238.9,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-07-14,QTTB,1,2.5557,21.38,16.94,2.22,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-07-14,PENG,2,2.1507,77.21,58.48,9.37,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-07-14,BAND,3,1.9154,73.81,63.37,5.22,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-07-14,CLYM,4,1.8431,13.21,11.38,0.92,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-07-14,DELL,5,1.7637,427.11,365.46,30.83,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
