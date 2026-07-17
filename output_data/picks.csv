@@ -109,3 +109,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-07-16,PENG,3,1.8877,72.85,53.07,9.89,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
 2026-07-16,CLYM,4,1.7764,13.87,11.98,0.95,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
 2026-07-16,ATEX,5,1.7745,105.34,90.31,7.51,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-07-17,QTTB,1,1.9397,15.21,9.93,2.64,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-07-17,CHRN,2,1.763,25.71,19.24,3.23,0.1,Unknown,⚠️ EARNINGS 2026-07-27 (10d),3-mo momentum + 6-mo momentum
+2026-07-17,PSNL,3,1.7628,15.58,13.06,1.26,0.2,Unknown,no earnings <10d,3-mo momentum + 1-mo momentum
+2026-07-17,AGL,4,1.7512,121.22,100.87,10.18,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-07-17,MRVI,5,1.7473,7.09,6.39,0.35,0.2,Unknown,no earnings <10d,3-mo momentum + vol-adj trend
