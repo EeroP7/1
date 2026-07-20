@@ -114,3 +114,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-07-17,PSNL,3,1.7628,15.58,13.06,1.26,0.2,Unknown,no earnings <10d,3-mo momentum + 1-mo momentum
 2026-07-17,AGL,4,1.7512,121.22,100.87,10.18,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
 2026-07-17,MRVI,5,1.7473,7.09,6.39,0.35,0.2,Unknown,no earnings <10d,3-mo momentum + vol-adj trend
+2026-07-20,QTTB,1,2.0964,15.05,9.77,2.64,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-07-20,CHRN,2,1.9003,26.43,19.68,3.37,0.1,Unknown,⚠️ EARNINGS 2026-07-27 (7d),3-mo momentum + 6-mo momentum
+2026-07-20,AGL,3,1.8162,129.84,109.43,10.2,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-07-20,BTSG,4,1.7458,70.69,65.58,2.56,0.2,Unknown,no earnings <10d,rising volume + vol-adj trend
+2026-07-20,CLYM,5,1.736,12.7,10.57,1.06,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
