@@ -119,3 +119,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-07-20,AGL,3,1.8162,129.84,109.43,10.2,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
 2026-07-20,BTSG,4,1.7458,70.69,65.58,2.56,0.2,Unknown,no earnings <10d,rising volume + vol-adj trend
 2026-07-20,CLYM,5,1.736,12.7,10.57,1.06,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
+2026-07-21,CHRN,1,2.1171,28.89,21.93,3.48,0.1,Unknown,⚠️ EARNINGS 2026-07-27 (6d),3-mo momentum + 6-mo momentum
+2026-07-21,QTTB,2,1.8431,15.04,9.84,2.6,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-07-21,AGL,3,1.7454,122.1,101.51,10.29,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-07-21,ETON,4,1.722,41.07,37.09,1.99,0.2,Unknown,no earnings <10d,6-mo momentum + 3-mo momentum
+2026-07-21,BAND,5,1.7216,68.8,57.11,5.84,0.1,Unknown,⚠️ EARNINGS 2026-07-29 (8d),3-mo momentum + 6-mo momentum
