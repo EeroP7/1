@@ -134,3 +134,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale,
 2026-07-24,MXL,3,1.8943,91.24,71.04,10.1,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-07-24,MU,4,1.8879,990.21,847.08,71.56,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-07-24,ADVB,5,1.7992,16.78,12.16,2.31,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-07-27,LQDA,1,2.0022,86.22,75.11,5.56,0.2,Unknown,no earnings <10d,3-mo momentum + vol-adj trend,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-07-27,ADVB,2,1.7606,18.98,13.24,2.87,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-07-27,ETON,3,1.7371,42.59,38.12,2.23,0.1,Unknown,⚠️ EARNINGS 2026-08-06 (10d),3-mo momentum + 6-mo momentum,CAUTION,earnings imminent: ⚠️ EARNINGS 2026-08-06 (10d),2,2,2,0,,,,,model
+2026-07-27,BTSGU,4,1.7096,238.26,229.36,4.45,0.2,Unknown,no earnings <10d,rising volume + vol-adj trend,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-07-27,TXG,5,1.6386,46.27,40.19,3.04,0.1,Unknown,⚠️ EARNINGS 2026-08-06 (10d),3-mo momentum + vol-adj trend,CAUTION,earnings imminent: ⚠️ EARNINGS 2026-08-06 (10d),2,2,2,0,,,,,model
