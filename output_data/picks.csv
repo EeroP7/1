@@ -144,3 +144,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-07-28,ETON,3,1.6513,42.31,37.78,2.27,0.1,Unknown,⚠️ EARNINGS 2026-08-06 (9d),6-mo momentum + 3-mo momentum
 2026-07-28,TXG,4,1.6422,45.92,40.01,2.96,0.1,Unknown,⚠️ EARNINGS 2026-08-06 (9d),3-mo momentum + 6-mo momentum
 2026-07-28,EVC,5,1.6375,11.08,9.72,0.68,0.1,Unknown,⚠️ EARNINGS 2026-08-04 (7d),3-mo momentum + 6-mo momentum
+2026-07-29,LQDA,1,2.0108,86.82,75.28,5.77,0.2,Unknown,no earnings <10d,3-mo momentum + vol-adj trend
+2026-07-29,FBRX,2,1.8175,76.65,61.58,7.53,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum
+2026-07-29,ETON,3,1.725,46.66,41.68,2.49,0.1,Unknown,⚠️ EARNINGS 2026-08-06 (8d),3-mo momentum + 6-mo momentum
+2026-07-29,EVC,4,1.6588,10.93,9.64,0.65,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-07-29,BTSGU,5,1.6556,238.29,229.9,4.2,0.2,Unknown,no earnings <10d,rising volume + vol-adj trend
