@@ -159,3 +159,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-07-31,LQDA,3,1.7354,86.8,75.14,5.83,0.2,Unknown,no earnings <10d,3-mo momentum + vol-adj trend
 2026-07-31,ETON,4,1.6771,49.03,43.73,2.65,0.1,Unknown,⚠️ EARNINGS 2026-08-06 (6d),3-mo momentum + 6-mo momentum
 2026-07-31,EVC,5,1.6461,11.62,10.25,0.68,0.1,Unknown,⚠️ EARNINGS 2026-08-10 (10d),3-mo momentum + 6-mo momentum
+2026-08-03,FBRX,1,1.7811,76.6,65.62,5.49,0.1,Unknown,⚠️ EARNINGS 2026-08-11 (8d),1-mo momentum + 3-mo momentum
+2026-08-03,ORKA,2,1.5732,96.51,85.52,5.5,0.1,Unknown,⚠️ EARNINGS 2026-08-10 (7d),6-mo momentum + 12-mo momentum
+2026-08-03,CORT,3,1.5619,114.49,101.63,6.43,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-08-03,LQDA,4,1.5412,84.11,72.92,5.6,0.1,Unknown,⚠️ EARNINGS 2026-08-12 (9d),3-mo momentum + vol-adj trend
+2026-08-03,EVC,5,1.5409,11.22,9.93,0.64,0.1,Unknown,⚠️ EARNINGS 2026-08-10 (7d),3-mo momentum + 6-mo momentum
