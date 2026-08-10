@@ -184,3 +184,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-08-07,TVTX,3,1.6866,62.45,56.18,3.13,0.2,Unknown,no earnings <10d,rising volume + 6-mo momentum
 2026-08-07,LQDA,4,1.6649,89.42,78.93,5.24,0.1,Unknown,⚠️ EARNINGS 2026-08-12 (5d),3-mo momentum + 12-mo momentum
 2026-08-07,ELVN,5,1.6376,60.27,54.35,2.96,0.1,Unknown,⚠️ EARNINGS 2026-08-12 (5d),6-mo momentum + rising volume
+2026-08-10,BLZE,1,2.0321,18.82,15.03,1.89,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-08-10,APPS,2,2.0276,14.34,11.94,1.2,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-08-10,TWST,3,1.6446,115.67,98.47,8.6,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-08-10,BFLY,4,1.6166,8.83,7.51,0.66,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-08-10,PGEN,5,1.6105,7.23,6.38,0.43,0.2,Unknown,no earnings <10d,3-mo momentum + vol-adj trend
