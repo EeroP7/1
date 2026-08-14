@@ -204,3 +204,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale,
 2026-08-13,ORKA,3,1.8184,107.4,96.46,5.47,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-08-13,BFLY,4,1.8182,9.45,7.98,0.74,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-08-13,BLZE,5,1.7759,19.34,15.37,1.99,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-14,TXG,1,2.0699,58.15,50.78,3.69,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-14,QMCO,2,1.9269,24.68,20.8,1.94,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-14,ORKA,3,1.8341,108.12,97.02,5.55,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-14,BLZE,4,1.792,20.43,16.36,2.03,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-14,DELL,5,1.7563,494.51,419.38,37.57,0.2,Unknown,no earnings <10d,6-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
