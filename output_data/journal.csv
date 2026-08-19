@@ -214,3 +214,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale,
 2026-08-17,QMCO,3,1.9567,26.11,21.84,2.14,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-08-17,CLYM,4,1.8779,16.33,14.31,1.01,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-08-17,ETON,5,1.8205,58.86,51.01,3.93,0.2,Unknown,no earnings <10d,6-mo momentum + mean-reversion,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-19,CLYM,1,2.1676,17.39,15.24,1.07,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-19,ORKA,2,2.0263,113.08,102.1,5.49,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-19,AEHR,3,1.9454,123.25,92.77,15.24,0.2,Unknown,no earnings <10d,6-mo momentum + tight range,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-19,ETON,4,1.8745,63.43,55.39,4.02,0.2,Unknown,no earnings <10d,6-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-19,AMLX,5,1.8707,35.11,30.35,2.38,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
