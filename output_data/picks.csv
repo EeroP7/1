@@ -219,3 +219,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-08-19,AEHR,3,1.9454,123.25,92.77,15.24,0.2,Unknown,no earnings <10d,6-mo momentum + tight range
 2026-08-19,ETON,4,1.8745,63.43,55.39,4.02,0.2,Unknown,no earnings <10d,6-mo momentum + 3-mo momentum
 2026-08-19,AMLX,5,1.8707,35.11,30.35,2.38,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum
+2026-08-20,CLYM,1,2.1405,17.34,15.08,1.13,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
+2026-08-20,ANRO,2,1.9359,34.89,30.86,2.02,0.2,Unknown,no earnings <10d,12-mo momentum + rising volume
+2026-08-20,ORKA,3,1.9188,109.69,99.05,5.32,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
+2026-08-20,AMLX,4,1.9054,38.6,33.51,2.55,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum
+2026-08-20,MRNA,5,1.8486,174.38,151.13,11.63,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum
