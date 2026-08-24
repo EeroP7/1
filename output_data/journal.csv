@@ -229,3 +229,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale,
 2026-08-21,MRVI,3,1.8832,8.29,7.29,0.5,0.2,Unknown,no earnings <10d,6-mo momentum + rising volume,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-08-21,TXG,4,1.8578,63.87,55.86,4.0,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-08-21,ORKA,5,1.8231,104.86,94.18,5.34,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-24,SLS,1,2.1983,15.46,13.36,1.05,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-24,CLYM,2,1.9617,17.28,15.01,1.13,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-24,ORKA,3,1.791,107.96,97.33,5.31,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-24,MRVI,4,1.7705,8.64,7.6,0.52,0.2,Unknown,no earnings <10d,6-mo momentum + rising volume,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-24,AMLX,5,1.762,38.66,33.13,2.77,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
