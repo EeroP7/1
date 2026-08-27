@@ -239,3 +239,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale,
 2026-08-25,AEHR,3,1.8238,96.43,68.2,14.11,0.2,Unknown,no earnings <10d,6-mo momentum + tight range,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-08-25,AXTI,4,1.7813,65.4,43.79,10.8,0.2,Unknown,no earnings <10d,12-mo momentum + tight range,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-08-25,MRNA,5,1.7645,138.89,104.92,16.98,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-26,SLS,1,2.1729,14.09,11.77,1.16,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-26,CLYM,2,1.9366,17.84,15.33,1.26,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-26,MRNA,3,1.8986,158.83,122.2,18.31,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-26,MRVI,4,1.8439,9.0,7.83,0.58,0.2,Unknown,no earnings <10d,6-mo momentum + rising volume,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-26,ORKA,5,1.7668,101.82,90.44,5.69,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
