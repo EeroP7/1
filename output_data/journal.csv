@@ -244,3 +244,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale,
 2026-08-26,MRNA,3,1.8986,158.83,122.2,18.31,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-08-26,MRVI,4,1.8439,9.0,7.83,0.58,0.2,Unknown,no earnings <10d,6-mo momentum + rising volume,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-08-26,ORKA,5,1.7668,101.82,90.44,5.69,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-28,SLS,1,2.2896,15.21,12.7,1.25,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-28,TXG,2,1.8488,64.85,56.77,4.04,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-28,ANRO,3,1.8315,36.3,32.08,2.11,0.2,Unknown,no earnings <10d,12-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-28,ORKA,4,1.7911,96.54,84.97,5.79,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-08-28,RVMD,5,1.7303,221.15,205.5,7.82,0.2,Unknown,no earnings <10d,12-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
