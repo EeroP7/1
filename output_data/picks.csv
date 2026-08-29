@@ -249,3 +249,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-08-28,ANRO,3,1.8315,36.3,32.08,2.11,0.2,Unknown,no earnings <10d,12-mo momentum + 3-mo momentum
 2026-08-28,ORKA,4,1.7911,96.54,84.97,5.79,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
 2026-08-28,RVMD,5,1.7303,221.15,205.5,7.82,0.2,Unknown,no earnings <10d,12-mo momentum + 6-mo momentum
+2026-08-29,SLS,1,2.0792,13.21,10.57,1.32,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
+2026-08-29,ANRO,2,1.7599,35.13,30.94,2.1,0.2,Unknown,no earnings <10d,12-mo momentum + 3-mo momentum
+2026-08-29,TXG,3,1.7411,61.54,54.16,3.69,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-08-29,BFLY,4,1.7339,8.43,7.2,0.62,0.2,Unknown,no earnings <10d,12-mo momentum + 6-mo momentum
+2026-08-29,CLYM,5,1.7166,14.57,11.96,1.31,0.2,Unknown,no earnings <10d,12-mo momentum + 6-mo momentum
