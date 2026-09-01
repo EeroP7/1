@@ -254,3 +254,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-08-29,TXG,3,1.7411,61.54,54.16,3.69,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
 2026-08-29,BFLY,4,1.7339,8.43,7.2,0.62,0.2,Unknown,no earnings <10d,12-mo momentum + 6-mo momentum
 2026-08-29,CLYM,5,1.7166,14.57,11.96,1.31,0.2,Unknown,no earnings <10d,12-mo momentum + 6-mo momentum
+2026-09-01,SLS,1,2.1723,13.34,10.67,1.34,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
+2026-09-01,ORKA,2,1.7522,92.62,81.28,5.67,0.2,Unknown,no earnings <10d,6-mo momentum + 12-mo momentum
+2026-09-01,ANRO,3,1.7198,35.38,31.16,2.11,0.2,Unknown,no earnings <10d,12-mo momentum + 3-mo momentum
+2026-09-01,CLYM,4,1.699,13.73,11.05,1.34,0.2,Unknown,no earnings <10d,12-mo momentum + tight range
+2026-09-01,CDNA,5,1.69,50.11,45.44,2.33,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
