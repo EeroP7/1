@@ -274,3 +274,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-09-10,PLSE,3,1.6047,52.97,45.85,3.56,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
 2026-09-10,MEI,4,1.533,13.99,11.26,1.36,0.2,Unknown,no earnings <10d,6-mo momentum + rising volume
 2026-09-10,XHLD,5,1.5197,10.51,8.43,1.04,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum
+2026-09-11,XHLD,1,1.7739,10.84,8.81,1.01,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum
+2026-09-11,IRD,2,1.71,6.07,4.93,0.57,0.2,Unknown,no earnings <10d,1-mo momentum + rising volume
+2026-09-11,PLSE,3,1.6689,54.43,46.64,3.89,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-09-11,CLYM,4,1.6064,14.95,12.3,1.33,0.2,Unknown,no earnings <10d,tight range + 6-mo momentum
+2026-09-11,INBX,5,1.4418,111.42,90.63,10.4,0.2,Unknown,no earnings <10d,tight range + rising volume
