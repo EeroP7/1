@@ -279,3 +279,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale,
 2026-09-11,PLSE,3,1.6689,54.43,46.64,3.89,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-09-11,CLYM,4,1.6064,14.95,12.3,1.33,0.2,Unknown,no earnings <10d,tight range + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-09-11,INBX,5,1.4418,111.42,90.63,10.4,0.2,Unknown,no earnings <10d,tight range + rising volume,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-09-15,PLSE,1,1.8535,54.21,45.97,4.12,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-09-15,XHLD,2,1.8133,8.92,5.59,1.67,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-09-15,IRD,3,1.776,5.97,4.76,0.6,0.2,Unknown,no earnings <10d,1-mo momentum + rising volume,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-09-15,HELP,4,1.5579,13.61,11.74,0.94,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-09-15,BNC,5,1.5413,5.27,4.21,0.53,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
