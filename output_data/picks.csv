@@ -284,3 +284,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-09-15,IRD,3,1.776,5.97,4.76,0.6,0.2,Unknown,no earnings <10d,1-mo momentum + rising volume
 2026-09-15,HELP,4,1.5579,13.61,11.74,0.94,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
 2026-09-15,BNC,5,1.5413,5.27,4.21,0.53,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum
+2026-09-16,XHLD,1,2.1728,9.43,6.02,1.71,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum
+2026-09-16,PLSE,2,1.9046,55.2,46.98,4.11,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-09-16,IRD,3,1.8401,5.82,4.62,0.6,0.2,Unknown,no earnings <10d,1-mo momentum + rising volume
+2026-09-16,FTH,4,1.6868,35.37,28.52,3.43,0.2,Unknown,no earnings <10d,3-mo momentum + tight range
+2026-09-16,HELP,5,1.5946,13.12,11.35,0.89,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
