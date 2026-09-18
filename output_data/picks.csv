@@ -294,3 +294,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-09-17,HELP,3,1.648,13.47,11.71,0.88,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
 2026-09-17,TXG,4,1.6114,72.68,64.53,4.08,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
 2026-09-17,LIFE,5,1.4411,38.55,33.42,2.57,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-09-18,XHLD,1,1.9858,9.72,6.4,1.66,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-09-18,SDGR,2,1.7878,30.24,26.93,1.66,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum
+2026-09-18,HELP,3,1.6989,14.02,12.22,0.9,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-09-18,TXG,4,1.6573,76.97,68.17,4.4,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-09-18,PLSE,5,1.6565,50.61,41.41,4.6,0.2,Unknown,no earnings <10d,3-mo momentum + tight range
