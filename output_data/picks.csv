@@ -309,3 +309,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-09-22,XHLD,3,1.7549,10.46,7.49,1.49,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum
 2026-09-22,TWST,4,1.7079,165.83,145.56,10.14,0.2,Unknown,no earnings <10d,6-mo momentum + 3-mo momentum
 2026-09-22,TXG,5,1.6568,79.1,70.55,4.28,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-09-23,HELP,1,1.9528,13.71,11.51,1.1,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-09-23,XHLD,2,1.9075,11.73,8.47,1.63,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum
+2026-09-23,SDGR,3,1.8753,30.7,27.04,1.83,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum
+2026-09-23,MRNA,4,1.8118,182.56,159.87,11.35,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-09-23,IOVA,5,1.7707,10.64,9.56,0.54,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
