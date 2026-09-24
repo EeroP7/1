@@ -314,3 +314,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale
 2026-09-23,SDGR,3,1.8753,30.7,27.04,1.83,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum
 2026-09-23,MRNA,4,1.8118,182.56,159.87,11.35,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
 2026-09-23,IOVA,5,1.7707,10.64,9.56,0.54,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-09-24,HELP,1,1.8726,13.02,10.78,1.12,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
+2026-09-24,XHLD,2,1.8721,12.08,8.61,1.74,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum
+2026-09-24,QMCO,3,1.8232,25.97,22.13,1.92,0.2,Unknown,no earnings <10d,6-mo momentum + 3-mo momentum
+2026-09-24,SDGR,4,1.8097,29.23,25.41,1.91,0.2,Unknown,no earnings <10d,1-mo momentum + 6-mo momentum
+2026-09-24,MRNA,5,1.7613,182.11,159.26,11.43,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum
