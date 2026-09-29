@@ -319,3 +319,8 @@ date,ticker,rank,score,entry_ref,stop,atr,weight,sector,earnings_flag,rationale,
 2026-09-24,QMCO,3,1.8232,25.97,22.13,1.92,0.2,Unknown,no earnings <10d,6-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-09-24,SDGR,4,1.8097,29.23,25.41,1.91,0.2,Unknown,no earnings <10d,1-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
 2026-09-24,MRNA,5,1.7613,182.11,159.26,11.43,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-09-29,QMCO,1,2.0688,31.4,26.54,2.43,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-09-29,SVRN,2,1.9619,52.05,39.99,6.03,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-09-29,KOD,3,1.7874,89.92,77.3,6.31,0.2,Unknown,no earnings <10d,1-mo momentum + 3-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-09-29,TXG,4,1.7083,88.5,77.47,5.51,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
+2026-09-29,MRNA,5,1.6687,197.28,173.4,11.94,0.2,Unknown,no earnings <10d,3-mo momentum + 6-mo momentum,CLEAR,unscreened (no API key),2,2,2,3,,,,,model
