@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Black Bruin S-Series — There Is Simply No Power Like It</title>
+<meta name="description" content="Black Bruin S-series direct drive radial piston hydraulic motors. Up to 22 500 cm³, 500 kW and 161 100 Nm — continuous high power without gears for shredders, drills, winches and conveyors." />
+<meta property="og:title" content="Black Bruin S-Series — There Is Simply No Power Like It" />
+<meta property="og:description" content="Direct drive radial piston hydraulic motors. 500 kW. 161 100 Nm. 450 bar. No gears." />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="en_US" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%230B0C0E'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%23FF7A1A' stroke-width='4'/%3E%3Ccircle cx='32' cy='32' r='7' fill='%23FF7A1A'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#0B0C0E;
+  --bg2:#111317;
+  --bg3:#16191E;
+  --line:#22262C;
+  --line-soft:#1A1D22;
+  --steel:#8D96A2;
+  --steel-dim:#5A626D;
+  --white:#F2F4F6;
+  --amber:#FF7A1A;
+  --amber-hot:#FFA24D;
+  --amber-dim:rgba(255,122,26,.14);
+  --ease:cubic-bezier(.22,.61,.24,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+body{
+  font-family:'Space Grotesk',system-ui,sans-serif;
+  background:var(--bg);color:var(--white);
+  font-size:1rem;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{background:var(--amber);color:#0B0C0E}
+a{color:inherit}
+img,svg{display:block;max-width:100%}
+.wrap{max-width:1240px;margin-inline:auto;padding-inline:clamp(1.25rem,4vw,3rem)}
+h1,h2,.display{font-family:'Anton',Impact,sans-serif;font-weight:400;line-height:.96;letter-spacing:.005em;text-transform:uppercase}
+.mono{font-family:'JetBrains Mono',monospace;font-feature-settings:"tnum"}
+
+/* grid texture */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(141,150,162,.045) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(141,150,162,.045) 1px,transparent 1px);
+  background-size:56px 56px;
+}
+main,header,footer{position:relative;z-index:1}
+
+.eyebrow{
+  display:inline-flex;align-items:center;gap:.8rem;
+  font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:500;
+  letter-spacing:.26em;text-transform:uppercase;color:var(--amber);
+}
+.eyebrow::before{content:"";width:2.4rem;height:1px;background:var(--amber)}
+.section{padding-block:clamp(4.5rem,10vw,8.5rem)}
+.section-head{max-width:52rem;margin-bottom:clamp(2.5rem,6vw,4.5rem)}
+.section-head h2{font-size:clamp(2.4rem,6vw,4.6rem);margin:1rem 0 1.2rem}
+.section-head h2 .hl{color:var(--amber)}
+.section-head p{color:var(--steel);font-size:1.05rem;max-width:42rem}
+
+.btn{
+  display:inline-flex;align-items:center;gap:.65rem;
+  padding:1rem 1.9rem;min-height:48px;
+  background:var(--amber);color:#0B0C0E;text-decoration:none;
+  font-weight:700;font-size:.9rem;letter-spacing:.08em;text-transform:uppercase;
+  border:1px solid var(--amber);border-radius:2px;cursor:pointer;
+  transition:background .2s var(--ease),color .2s var(--ease),box-shadow .25s var(--ease),transform .2s var(--ease);
+}
+.btn:hover{background:var(--amber-hot);border-color:var(--amber-hot);box-shadow:0 0 34px rgba(255,122,26,.35)}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:transparent;color:var(--white);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--amber);color:var(--amber);box-shadow:none;background:var(--amber-dim)}
+.btn svg{width:1rem;height:1rem;flex:none}
+a:focus-visible,button:focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:2px}
+.skip{position:absolute;left:1rem;top:-4rem;z-index:300;background:var(--amber);color:#0B0C0E;padding:.7rem 1.2rem;border-radius:2px;text-decoration:none;font-weight:700;transition:top .2s}
+.skip:focus{top:1rem}
+
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}}
+
+/* ---------- nav ---------- */
+.nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(11,12,14,.82);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid transparent;transition:border-color .3s;
+}
+.nav.scrolled{border-bottom-color:var(--line)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:2rem;height:4.6rem}
+.logo{display:flex;align-items:center;gap:.7rem;text-decoration:none}
+.logo svg{width:2rem;height:2rem}
+.logo b{font-family:'Anton',sans-serif;font-weight:400;font-size:1.15rem;letter-spacing:.06em;text-transform:uppercase}
+.logo b span{color:var(--amber)}
+.nav-links{display:flex;align-items:center;gap:2rem;list-style:none}
+.nav-links a{
+  text-decoration:none;font-size:.86rem;font-weight:500;color:var(--steel);
+  letter-spacing:.04em;padding:.4rem 0;position:relative;transition:color .2s;
+}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:1.5px;background:var(--amber);transform:scaleX(0);transform-origin:left;transition:transform .25s var(--ease)}
+.nav-links a:hover{color:var(--white)}
+.nav-links a:hover::after{transform:scaleX(1)}
+.nav-tel{
+  display:inline-flex;align-items:center;gap:.55rem;text-decoration:none;
+  font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:500;
+  padding:.65rem 1.1rem;min-height:44px;border:1px solid var(--line);border-radius:2px;
+  color:var(--steel);transition:all .2s;
+}
+.nav-tel:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-dim)}
+.nav-tel svg{width:.9rem;height:.9rem}
+.menu-btn{display:none;background:none;border:1px solid var(--line);border-radius:2px;width:44px;height:44px;cursor:pointer;align-items:center;justify-content:center;color:var(--white)}
+@media (max-width:960px){
+  .nav-links{
+    position:fixed;inset:4.6rem 0 auto 0;flex-direction:column;align-items:stretch;gap:0;
+    background:var(--bg2);border-bottom:1px solid var(--line);padding:1rem 1.5rem 1.5rem;display:none;
+  }
+  .nav-links.open{display:flex}
+  .nav-links a{padding:1rem .25rem;font-size:1.05rem;border-bottom:1px solid var(--line-soft)}
+  .menu-btn{display:inline-flex}
+  .nav-tel span{display:none}
+  .nav-tel{padding:.65rem .8rem}
+}
+
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+.hero::after{
+  content:"";position:absolute;top:-30%;right:-15%;width:70%;aspect-ratio:1;
+  background:radial-gradient(circle,rgba(255,122,26,.13),transparent 62%);
+  pointer-events:none;
+}
+.hero-inner{
+  display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+  gap:clamp(2rem,5vw,4rem);align-items:center;
+  padding-block:clamp(4rem,9vw,7rem) clamp(3.5rem,7vw,5.5rem);
+}
+.hero h1{font-size:clamp(3.2rem,9vw,7.6rem);margin:1.4rem 0 1.6rem}
+.hero h1 .hl{color:var(--amber);text-shadow:0 0 60px rgba(255,122,26,.4)}
+.hero-lead{color:var(--steel);font-size:clamp(1rem,1.4vw,1.15rem);max-width:34rem;margin-bottom:2.4rem}
+.hero-actions{display:flex;flex-wrap:wrap;gap:1rem}
+.hero-art{position:relative;z-index:1}
+.hero-art svg{width:min(100%,560px);margin-inline:auto;filter:drop-shadow(0 0 60px rgba(255,122,26,.12))}
+@media (max-width:960px){.hero-inner{grid-template-columns:1fr}.hero-art{order:-1;max-width:26rem;margin-inline:auto}}
+
+/* rotating assemblies */
+.spin-slow{animation:spin 46s linear infinite;transform-origin:300px 300px}
+.spin-rev{animation:spin 70s linear infinite reverse;transform-origin:300px 300px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pulse{animation:pulse 3.2s var(--ease) infinite}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.spin-slow,.spin-rev{animation:none}.pulse{animation:none;opacity:.8}}
+
+/* hero stat bar */
+.statbar{border-top:1px solid var(--line);background:var(--bg2)}
+.statbar-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.hstat{padding:1.8rem clamp(1rem,2.5vw,2.2rem);border-left:1px solid var(--line)}
+.hstat:first-child{border-left:none;padding-left:0}
+.hstat b{
+  display:block;font-family:'Anton',sans-serif;font-weight:400;
+  font-size:clamp(1.9rem,3.6vw,3rem);line-height:1.05;letter-spacing:.01em;
+}
+.hstat b i{font-style:normal;color:var(--amber);font-size:.55em;margin-left:.25rem;letter-spacing:.06em}
+.hstat span{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--steel-dim)}
+@media (max-width:760px){
+  .statbar-grid{grid-template-columns:1fr 1fr}
+  .hstat{border-left:none;border-top:1px solid var(--line);padding-left:0}
+  .hstat:nth-child(-n+2){border-top:none}
+}
+
+/* ---------- marquee ---------- */
+.marquee{overflow:hidden;border-bottom:1px solid var(--line);background:var(--bg);padding-block:1.15rem}
+.marquee-track{display:flex;gap:3.2rem;width:max-content;animation:scroll 30s linear infinite}
+.marquee-track span{
+  font-family:'Anton',sans-serif;font-size:1rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--steel-dim);white-space:nowrap;display:flex;align-items:center;gap:3.2rem;
+}
+.marquee-track span::after{content:"";width:.5rem;height:.5rem;background:var(--amber);transform:rotate(45deg)}
+@keyframes scroll{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.marquee-track{animation:none;flex-wrap:wrap;width:auto;gap:1.4rem}}
+
+/* ---------- tech features ---------- */
+.feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.feat{background:var(--bg);padding:clamp(1.6rem,3vw,2.3rem);transition:background .3s var(--ease);position:relative;overflow:hidden}
+.feat:hover{background:var(--bg3)}
+.feat::after{content:"";position:absolute;left:0;top:0;width:100%;height:2px;background:var(--amber);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
+.feat:hover::after{transform:scaleX(1)}
+.feat .fnum{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.2em;color:var(--amber)}
+.feat svg{width:2.4rem;height:2.4rem;margin:1.3rem 0 1rem;color:var(--amber)}
+.feat h3{font-size:1.12rem;font-weight:700;letter-spacing:.01em;margin-bottom:.55rem}
+.feat p{font-size:.9rem;color:var(--steel)}
+@media (max-width:960px){.feat-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:600px){.feat-grid{grid-template-columns:1fr}}
+
+/* ---------- spec selector ---------- */
+.specs{background:var(--bg2);border-block:1px solid var(--line)}
+.model-tabs{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:2.2rem}
+.model-tab{
+  font-family:'JetBrains Mono',monospace;font-size:.88rem;font-weight:500;
+  padding:.7rem 1.35rem;min-height:44px;cursor:pointer;
+  background:transparent;border:1px solid var(--line);border-radius:2px;color:var(--steel);
+  transition:all .2s var(--ease);letter-spacing:.06em;
+}
+.model-tab:hover{border-color:var(--steel);color:var(--white)}
+.model-tab[aria-pressed="true"]{background:var(--amber);border-color:var(--amber);color:#0B0C0E;font-weight:700;box-shadow:0 0 26px rgba(255,122,26,.3)}
+.spec-panel{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--line);border:1px solid var(--line);
+}
+.spec-cell{background:var(--bg);padding:clamp(1.4rem,3vw,2rem)}
+.spec-cell .lab{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--steel-dim);display:block;margin-bottom:.6rem}
+.spec-cell .val{
+  font-family:'Anton',sans-serif;font-size:clamp(1.5rem,2.8vw,2.3rem);line-height:1.1;
+  transition:opacity .25s var(--ease);
+}
+.spec-cell .val i{font-style:normal;font-size:.5em;color:var(--amber);letter-spacing:.06em;margin-left:.3rem}
+.spec-cell .sub{font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--steel-dim);margin-top:.5rem;display:block;min-height:1.2em}
+.spec-extra{
+  margin-top:1.4rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem;
+}
+.spec-note{
+  border:1px solid var(--line);border-left:2px solid var(--amber);border-radius:2px;
+  background:var(--bg);padding:1.1rem 1.3rem;font-size:.86rem;color:var(--steel);
+}
+.spec-note b{color:var(--white);font-weight:700;display:block;margin-bottom:.2rem;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase}
+.specs .mono-fade{transition:opacity .25s var(--ease)}
+.fade-out{opacity:0}
+@media (max-width:820px){.spec-panel{grid-template-columns:1fr 1fr}.spec-extra{grid-template-columns:1fr}}
+@media (max-width:520px){.spec-panel{grid-template-columns:1fr}}
+
+/* ---------- applications ---------- */
+.apps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.app{
+  background:var(--bg);padding:clamp(1.7rem,3vw,2.4rem);min-height:12rem;
+  display:flex;flex-direction:column;justify-content:space-between;gap:1.6rem;
+  position:relative;overflow:hidden;transition:background .3s;
+}
+.app:hover{background:var(--bg3)}
+.app .aidx{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.2em;color:var(--steel-dim)}
+.app h3{font-family:'Anton',sans-serif;font-weight:400;font-size:1.55rem;letter-spacing:.02em;text-transform:uppercase}
+.app p{font-size:.88rem;color:var(--steel)}
+.app svg{position:absolute;right:1.4rem;top:1.4rem;width:1.9rem;height:1.9rem;color:var(--steel-dim);transition:color .3s,transform .3s var(--ease)}
+.app:hover svg{color:var(--amber);transform:scale(1.12)}
+@media (max-width:900px){.apps-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.apps-grid{grid-template-columns:1fr}}
+
+/* ---------- heritage ---------- */
+.heritage{border-block:1px solid var(--line);background:var(--bg2);position:relative;overflow:hidden}
+.heritage::before{
+  content:"1958";position:absolute;right:-1rem;bottom:-4rem;
+  font-family:'Anton',sans-serif;font-size:clamp(12rem,30vw,26rem);line-height:1;
+  color:transparent;-webkit-text-stroke:1px var(--line);pointer-events:none;
+}
+.heritage-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(2.5rem,6vw,5rem);position:relative}
+.heritage p.body{color:var(--steel);margin-bottom:1.4rem;max-width:36rem}
+.heritage p.body b{color:var(--white)}
+.quote{
+  border:1px solid var(--line);border-left:2px solid var(--amber);border-radius:2px;
+  background:var(--bg);padding:clamp(1.8rem,4vw,2.6rem);align-self:start;position:relative;
+}
+.quote blockquote{font-size:clamp(1.15rem,2vw,1.5rem);font-weight:500;line-height:1.45;margin-bottom:1.4rem}
+.quote blockquote::before{content:"“";color:var(--amber);font-family:'Anton',sans-serif;font-size:1.6em;line-height:0;vertical-align:-.35em;margin-right:.15rem}
+.quote cite{font-style:normal;font-family:'JetBrains Mono',monospace;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--steel-dim)}
+.quote cite b{color:var(--amber);display:block;margin-bottom:.15rem}
+@media (max-width:900px){.heritage-grid{grid-template-columns:1fr}}
+
+/* ---------- contact ---------- */
+.contact-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(2.5rem,6vw,5rem);align-items:center}
+.contact-grid h2{font-size:clamp(2.6rem,6.5vw,5rem);margin:1rem 0 1.3rem}
+.contact-grid h2 .hl{color:var(--amber)}
+.contact-grid p.lead{color:var(--steel);max-width:32rem;margin-bottom:2.2rem}
+.card{
+  background:var(--bg2);border:1px solid var(--line);border-radius:2px;
+  padding:clamp(1.8rem,4vw,2.6rem);
+}
+.card .role{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:.4rem}
+.card h3{font-family:'Anton',sans-serif;font-weight:400;font-size:1.6rem;letter-spacing:.03em;text-transform:uppercase;margin-bottom:1.4rem}
+.card ul{list-style:none;border-top:1px solid var(--line)}
+.card li{border-bottom:1px solid var(--line)}
+.card a,.card .line{display:flex;align-items:center;gap:.9rem;padding:1rem .2rem;text-decoration:none;font-size:.95rem;min-height:44px;transition:color .2s}
+.card a:hover{color:var(--amber)}
+.card svg{width:1.05rem;height:1.05rem;flex:none;color:var(--amber)}
+@media (max-width:900px){.contact-grid{grid-template-columns:1fr}}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--line);padding-block:2.4rem;background:var(--bg)}
+.foot{display:flex;flex-wrap:wrap;gap:1.4rem;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--steel-dim)}
+.foot .logo b{font-size:.98rem}
+.foot-links{display:flex;gap:1.6rem;list-style:none;flex-wrap:wrap}
+.foot-links a{text-decoration:none;transition:color .2s}
+.foot-links a:hover{color:var(--white)}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a class="logo" href="#" aria-label="Black Bruin — top">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="24" fill="none" stroke="#FF7A1A" stroke-width="3.5"/>
+        <circle cx="32" cy="32" r="7" fill="#FF7A1A"/>
+        <g stroke="#F2F4F6" stroke-width="3" stroke-linecap="round">
+          <line x1="32" y1="14" x2="32" y2="21"/><line x1="32" y1="43" x2="32" y2="50"/>
+          <line x1="14" y1="32" x2="21" y2="32"/><line x1="43" y1="32" x2="50" y2="32"/>
+        </g>
+      </svg>
+      <b>Black<span>Bruin</span></b>
+    </a>
+    <nav aria-label="Main">
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#technology">Technology</a></li>
+        <li><a href="#sseries">S-Series</a></li>
+        <li><a href="#applications">Applications</a></li>
+        <li><a href="#heritage">Heritage</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div style="display:flex;align-items:center;gap:1rem">
+      <a class="nav-tel" href="tel:+358504193484">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <span>+358 50 419 3484</span>
+      </a>
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <div>
+        <p class="eyebrow">Radial piston · Direct drive · Finland</p>
+        <h1>There is simply <span class="hl">no power</span> like it.</h1>
+        <p class="hero-lead">
+          Black Bruin S-series direct drive hydraulic motors deliver continuous high
+          power without gears — rated up to 22&thinsp;500 cm³ and 500 kW for the world's
+          most demanding shredders, drills, winches and conveyors.
+        </p>
+        <div class="hero-actions">
+          <a class="btn" href="#sseries">Explore the S-Series
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+          </a>
+          <a class="btn ghost" href="#contact">Talk to an engineer</a>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <!-- Animated radial piston motor cross-section -->
+        <svg viewBox="0 0 600 600" fill="none">
+          <defs>
+            <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="5" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <!-- registration marks -->
+          <g stroke="#22262C" stroke-width="1.2">
+            <path d="M24 44V24h20M556 24h20v20M576 556v20h-20M44 576H24v-20"/>
+          </g>
+          <!-- crosshairs -->
+          <g stroke="#22262C" stroke-width="1">
+            <line x1="300" y1="16" x2="300" y2="88"/>
+            <line x1="300" y1="512" x2="300" y2="584"/>
+            <line x1="16" y1="300" x2="88" y2="300"/>
+            <line x1="512" y1="300" x2="584" y2="300"/>
+          </g>
+          <!-- outer housing -->
+          <circle cx="300" cy="300" r="252" stroke="#3A414A" stroke-width="2.5"/>
+          <circle cx="300" cy="300" r="238" stroke="#22262C" stroke-width="1.4"/>
+          <!-- cam ring lobes (8) -->
+          <g stroke="#5A626D" stroke-width="2">
+            <path d="M300 78a222 222 0 0 1 157 65l-24 24a188 188 0 0 0-133-55z"/>
+            <path d="M522 300a222 222 0 0 1-65 157l-24-24a188 188 0 0 0 55-133z"/>
+            <path d="M300 522a222 222 0 0 1-157-65l24-24a188 188 0 0 0 133 55z"/>
+            <path d="M78 300a222 222 0 0 1 65-157l24 24a188 188 0 0 0-55 133z"/>
+          </g>
+          <!-- rotating dashed rings -->
+          <g class="spin-rev">
+            <circle cx="300" cy="300" r="216" stroke="#22262C" stroke-width="1.2" stroke-dasharray="4 14"/>
+          </g>
+          <circle cx="300" cy="300" r="190" stroke="#3A414A" stroke-width="1.6"/>
+          <!-- rotating piston assembly -->
+          <g class="spin-slow">
+            <g stroke="#8D96A2" stroke-width="2">
+              <!-- 8 radial pistons -->
+              <g transform="rotate(0 300 300)"><rect x="288" y="122" width="24" height="70" rx="3"/><rect x="292" y="192" width="16" height="36" rx="2" fill="#16191E"/></g>
+              <g transform="rotate(45 300 300)"><rect x="288" y="122" width="24" height="70" rx="3"/><rect x="292" y="192" width="16" height="36" rx="2" fill="#16191E"/></g>
+              <g transform="rotate(90 300 300)"><rect x="288" y="122" width="24" height="70" rx="3"/><rect x="292" y="192" width="16" height="36" rx="2" fill="#16191E"/></g>
+              <g transform="rotate(135 300 300)"><rect x="288" y="122" width="24" height="70" rx="3"/><rect x="292" y="192" width="16" height="36" rx="2" fill="#16191E"/></g>
+              <g transform="rotate(180 300 300)"><rect x="288" y="122" width="24" height="70" rx="3"/><rect x="292" y="192" width="16" height="36" rx="2" fill="#16191E"/></g>
+              <g transform="rotate(225 300 300)"><rect x="288" y="122" width="24" height="70" rx="3"/><rect x="292" y="192" width="16" height="36" rx="2" fill="#16191E"/></g>
+              <g transform="rotate(270 300 300)"><rect x="288" y="122" width="24" height="70" rx="3"/><rect x="292" y="192" width="16" height="36" rx="2" fill="#16191E"/></g>
+              <g transform="rotate(315 300 300)"><rect x="288" y="122" width="24" height="70" rx="3"/><rect x="292" y="192" width="16" height="36" rx="2" fill="#16191E"/></g>
+            </g>
+            <!-- piston crowns (amber) -->
+            <g fill="#FF7A1A" filter="url(#glow)">
+              <g transform="rotate(0 300 300)"><rect x="290" y="116" width="20" height="8" rx="2"/></g>
+              <g transform="rotate(45 300 300)"><rect x="290" y="116" width="20" height="8" rx="2"/></g>
+              <g transform="rotate(90 300 300)"><rect x="290" y="116" width="20" height="8" rx="2"/></g>
+              <g transform="rotate(135 300 300)"><rect x="290" y="116" width="20" height="8" rx="2"/></g>
+              <g transform="rotate(180 300 300)"><rect x="290" y="116" width="20" height="8" rx="2"/></g>
+              <g transform="rotate(225 300 300)"><rect x="290" y="116" width="20" height="8" rx="2"/></g>
+              <g transform="rotate(270 300 300)"><rect x="290" y="116" width="20" height="8" rx="2"/></g>
+              <g transform="rotate(315 300 300)"><rect x="290" y="116" width="20" height="8" rx="2"/></g>
+            </g>
+            <!-- rotor body -->
+            <circle cx="300" cy="300" r="72" stroke="#8D96A2" stroke-width="2.4" fill="#0B0C0E"/>
+            <circle cx="300" cy="300" r="58" stroke="#3A414A" stroke-width="1.4"/>
+            <!-- splined shaft -->
+            <g stroke="#FF7A1A" stroke-width="2.4">
+              <line x1="300" y1="266" x2="300" y2="276"/><line x1="300" y1="324" x2="300" y2="334"/>
+              <line x1="266" y1="300" x2="276" y2="300"/><line x1="324" y1="300" x2="334" y2="300"/>
+              <line x1="276" y1="276" x2="283" y2="283"/><line x1="317" y1="317" x2="324" y2="324"/>
+              <line x1="324" y1="276" x2="317" y2="283"/><line x1="283" y1="317" x2="276" y2="324"/>
+            </g>
+            <circle cx="300" cy="300" r="20" fill="#FF7A1A" filter="url(#glow)"/>
+          </g>
+          <!-- pressure indicators -->
+          <g class="pulse" stroke="#FF7A1A" stroke-width="1.4">
+            <circle cx="300" cy="300" r="150" stroke-dasharray="2 22" opacity=".6"/>
+          </g>
+          <!-- annotations -->
+          <g font-family="JetBrains Mono, monospace" font-size="11" fill="#5A626D" letter-spacing="1.5">
+            <text x="300" y="46" text-anchor="middle">RADIAL PISTON · CAM RING</text>
+            <text x="300" y="570" text-anchor="middle">DIRECT DRIVE — NO GEARS</text>
+            <text x="36" y="306" transform="rotate(-90 36 306)" text-anchor="middle">450 BAR</text>
+            <text x="566" y="306" transform="rotate(90 566 306)" text-anchor="middle">500 KW</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div class="statbar">
+      <div class="wrap statbar-grid">
+        <div class="hstat reveal"><b><span class="count" data-to="500">0</span><i>kW</i></b><span>max continuous power</span></div>
+        <div class="hstat reveal"><b><span class="count" data-to="161100">0</span><i>Nm</i></b><span>max output torque</span></div>
+        <div class="hstat reveal"><b><span class="count" data-to="450">0</span><i>bar</i></b><span>max pressure</span></div>
+        <div class="hstat reveal"><b><span class="count" data-to="22500">0</span><i>cm³</i></b><span>max displacement</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee" aria-label="Applications">
+    <div class="marquee-track">
+      <span>Shredders</span><span>Augers</span><span>Winches</span><span>Conveyors</span><span>Drills</span><span>Mixers</span><span>Kilns</span><span>Mills</span>
+      <span aria-hidden="true">Shredders</span><span aria-hidden="true">Augers</span><span aria-hidden="true">Winches</span><span aria-hidden="true">Conveyors</span><span aria-hidden="true">Drills</span><span aria-hidden="true">Mixers</span><span aria-hidden="true">Kilns</span><span aria-hidden="true">Mills</span>
+    </div>
+  </div>
+
+  <!-- ============ TECHNOLOGY ============ -->
+  <section class="section" id="technology">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">Technology</p>
+        <h2>Sovereign power.<br /><span class="hl">Zero gears.</span></h2>
+        <p>The robust mechanical construction combined with serviceable torque-transmitting
+        components transmits hydraulic energy directly to the shaft — high torque even at
+        the lowest speeds, with nothing in between to wear out.</p>
+      </div>
+      <div class="feat-grid">
+        <article class="feat reveal">
+          <span class="fnum">01</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/></svg>
+          <h3>Robust piston design</h3>
+          <p>Radial pistons on a cam ring produce continuous high power efficiently — a construction proven over six decades in the field.</p>
+        </article>
+        <article class="feat reveal">
+          <span class="fnum">02</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1.6"/><circle cx="4" cy="12" r="1.6"/><circle cx="4" cy="18" r="1.6"/></svg>
+          <h3>Several output shafts</h3>
+          <p>Internal or external splines, solid or the uniquely useful through-hole shaft — matched to your machine, not the other way around.</p>
+        </article>
+        <article class="feat reveal">
+          <span class="fnum">03</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
+          <h3>Shift-on-the-go 2-speed</h3>
+          <p>Switch between 100% and 50% displacement under load — torque for the bite, speed for the cycle, no stopping.</p>
+        </article>
+        <article class="feat reveal">
+          <span class="fnum">04</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3c3 3 6 4 8 4-1 9-4 12-8 14-4-2-7-5-8-14 2 0 5-1 8-4z"/><path d="M9.5 12l2 2 3.5-4"/></svg>
+          <h3>Triple-sealed protection</h3>
+          <p>Sealed against dust, slurry and seawater. A Black Bruin goes on after any other solution gives up.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ S-SERIES SPECS ============ -->
+  <section class="section specs" id="sseries">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">S-Series lineup</p>
+        <h2>Pick your <span class="hl">torque.</span></h2>
+        <p>Seven models. From 4&thinsp;400 to 22&thinsp;500 cm³, with optional static wet
+        multi-disc parking brake (SAHR) on the 100-series variants. All data from the
+        official S-series specification.</p>
+      </div>
+
+      <div class="model-tabs reveal" id="modelTabs" role="group" aria-label="Select motor model">
+        <button class="model-tab" data-model="S1000" aria-pressed="true">S1000</button>
+        <button class="model-tab" data-model="S2000" aria-pressed="false">S2000</button>
+        <button class="model-tab" data-model="S3000" aria-pressed="false">S3000</button>
+        <button class="model-tab" data-model="S3010" aria-pressed="false">S3010</button>
+        <button class="model-tab" data-model="S1100" aria-pressed="false">S1100</button>
+        <button class="model-tab" data-model="S2100" aria-pressed="false">S2100</button>
+        <button class="model-tab" data-model="S3100" aria-pressed="false">S3100</button>
+      </div>
+
+      <div class="spec-panel reveal" aria-live="polite">
+        <div class="spec-cell"><span class="lab">Displacement</span><span class="val mono-fade" id="sp-disp">—</span><span class="sub mono-fade" id="sp-disp-sub"></span></div>
+        <div class="spec-cell"><span class="lab">Max torque</span><span class="val mono-fade" id="sp-torque">—</span><span class="sub mono-fade" id="sp-torque-sub"></span></div>
+        <div class="spec-cell"><span class="lab">Max power</span><span class="val mono-fade" id="sp-power">—</span><span class="sub mono-fade" id="sp-power-sub"></span></div>
+        <div class="spec-cell"><span class="lab">Max speed</span><span class="val mono-fade" id="sp-speed">—</span><span class="sub mono-fade" id="sp-speed-sub"></span></div>
+        <div class="spec-cell"><span class="lab">Max pressure</span><span class="val mono-fade" id="sp-pressure">—</span><span class="sub mono-fade" id="sp-pressure-sub"></span></div>
+        <div class="spec-cell"><span class="lab">Weight</span><span class="val mono-fade" id="sp-weight">—</span><span class="sub mono-fade" id="sp-weight-sub"></span></div>
+      </div>
+
+      <div class="spec-extra reveal">
+        <div class="spec-note"><b>Displacement control</b><span class="mono-fade" id="sp-control">—</span></div>
+        <div class="spec-note"><b>Shaft &amp; brake</b><span class="mono-fade" id="sp-shaft">—</span></div>
+      </div>
+
+      <p class="reveal" style="margin-top:2rem">
+        <a class="btn ghost" href="https://www.blackbruin.com/products/hydraulic-motors/s-series" target="_blank" rel="noopener">
+          Official brochure &amp; manual
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ APPLICATIONS ============ -->
+  <section class="section" id="applications">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">Applications</p>
+        <h2>Built for the work<br />that <span class="hl">breaks machines.</span></h2>
+        <p>For over 65 years Black Bruin radial piston motors have powered mobile and
+        industrial machinery worldwide — wherever low speed and brutally high torque decide
+        whether the job gets done.</p>
+      </div>
+      <div class="apps-grid">
+        <article class="app reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 20h16M6 20V9l4-5 4 5v11M14 12h4v8"/></svg>
+          <span class="aidx">A—01</span>
+          <div><h3>Recycling</h3><p>Industrial shredders that chew metal, tyres and refuse — torque spikes absorbed without gearboxes to shear.</p></div>
+        </article>
+        <article class="app reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 2v20M12 6l5 3M12 6 7 9M12 12l5 3M12 12l-5 3"/></svg>
+          <span class="aidx">A—02</span>
+          <div><h3>Drilling</h3><p>Greater auger diameter and faster operation — S-series power translated straight into the ground.</p></div>
+        </article>
+        <article class="app reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l6 4"/></svg>
+          <span class="aidx">A—03</span>
+          <div><h3>Winches</h3><p>Full torque from zero rpm with optional 95 000 Nm wet multi-disc parking brake holding the load.</p></div>
+        </article>
+        <article class="app reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M3 12h18M6 7h12"/></svg>
+          <span class="aidx">A—04</span>
+          <div><h3>Conveyors</h3><p>Continuous duty in mining and material handling — maximal performance and uptime, minimal service.</p></div>
+        </article>
+        <article class="app reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 18c3-1 5-6 9-6s6 5 9 6M3 18h18M8 12V6l4-2 4 2v6"/></svg>
+          <span class="aidx">A—05</span>
+          <div><h3>Marine &amp; offshore</h3><p>Triple-sealed against seawater. Dependable rotation where a service call means a helicopter.</p></div>
+        </article>
+        <article class="app reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m5 20 3-9 4 4 3-11 4 16M2 20h20"/></svg>
+          <span class="aidx">A—06</span>
+          <div><h3>Mining</h3><p>Feeders, mills and crushers running around the clock — in the applications where everything else is consumable.</p></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HERITAGE ============ -->
+  <section class="section heritage" id="heritage">
+    <div class="wrap heritage-grid">
+      <div class="reveal">
+        <p class="eyebrow">Heritage</p>
+        <h2 style="font-size:clamp(2.2rem,5.5vw,4rem);margin:1rem 0 1.4rem">The bear from<br /><span style="color:var(--amber)">Jyväskylä.</span></h2>
+        <p class="body">Black Bruin radial piston motors are based on a <b>Finnish invention</b> —
+        innovator Ilmari Louhio's original idea of a vehicle that could go anywhere and haul
+        loads from the remotest work sites. Over 65 years later, the same radial piston
+        cam ring technology drives machinery on every continent.</p>
+        <p class="body"><b>A Black Bruin goes on after any other solution gives up.</b>
+        Its serviceability is superior to any other solution available — torque-transmitting
+        components can be serviced without removing the motor from the machine.</p>
+      </div>
+      <aside class="quote reveal">
+        <blockquote>We have implemented Black Bruin motors in places where I don't think
+        even the Black Bruin guys thought it was possible.</blockquote>
+        <cite><b>Eugene Tondolo</b>Axiom Hydraulics</cite>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section class="section" id="contact">
+    <div class="wrap contact-grid">
+      <div class="reveal">
+        <p class="eyebrow">Contact</p>
+        <h2>Get the job <span class="hl">done.</span></h2>
+        <p class="lead">From product selection to installation support, our factory technical
+        team is ready to help. Simply contact us — it's as direct as the power our motors provide.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:1rem">
+          <a class="btn" href="mailto:info@blackbruin.com">Email an engineer
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+          </a>
+          <a class="btn ghost" href="tel:+358504193484">+358 50 419 3484</a>
+        </div>
+      </div>
+      <div class="card reveal">
+        <p class="role">Factory &amp; headquarters</p>
+        <h3>Black Bruin Inc.</h3>
+        <ul>
+          <li><span class="line">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 21s-7-5.1-7-11a7 7 0 0 1 14 0c0 5.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+            Valmetintie 9, 40420 Jyskä, Finland</span></li>
+          <li><a href="tel:+358504193484">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            +358 50 419 3484</a></li>
+          <li><a href="mailto:info@blackbruin.com">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7L22 7"/></svg>
+            info@blackbruin.com</a></li>
+          <li><a href="https://www.blackbruin.com" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18-3-3-3-15 0-18z"/></svg>
+            www.blackbruin.com</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <a class="logo" href="#" aria-label="Black Bruin — top">
+      <svg viewBox="0 0 64 64" width="24" height="24" aria-hidden="true">
+        <circle cx="32" cy="32" r="24" fill="none" stroke="#FF7A1A" stroke-width="3.5"/>
+        <circle cx="32" cy="32" r="7" fill="#FF7A1A"/>
+      </svg>
+      <b>Black<span style="color:var(--amber)">Bruin</span></b>
+    </a>
+    <ul class="foot-links">
+      <li><a href="#technology">Technology</a></li>
+      <li><a href="#sseries">S-Series</a></li>
+      <li><a href="#applications">Applications</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <span>Concept redesign · Data © Black Bruin Inc.</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* nav */
+  var nav = document.getElementById('nav');
+  addEventListener('scroll', function () { nav.classList.toggle('scrolled', scrollY > 8); }, { passive: true });
+  var btn = document.getElementById('menuBtn'), links = document.getElementById('navLinks');
+  btn.addEventListener('click', function () {
+    var open = links.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open);
+  });
+  links.addEventListener('click', function (e) {
+    if (e.target.tagName === 'A') { links.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+  });
+
+  /* reveal */
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+
+  /* count-up stats */
+  function animateCount(el) {
+    var to = parseInt(el.dataset.to, 10);
+    if (reduced) { el.textContent = to.toLocaleString('en').replace(/,/g, ' '); return; }
+    var t0 = null, dur = 1600;
+    function step(t) {
+      if (!t0) t0 = t;
+      var p = Math.min((t - t0) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(to * eased).toLocaleString('en').replace(/,/g, ' ');
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  var cio = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { animateCount(e.target); cio.unobserve(e.target); }
+    });
+  }, { threshold: 0.4 });
+  document.querySelectorAll('.count').forEach(function (el) { cio.observe(el); });
+
+  /* ---------- S-series model data (official spec) ---------- */
+  var MODELS = {
+    S1000: { disp: '4 400 – 6 300', torque: '45 100', power: '175', speed: '180', pressure: '450', weight: '430 – 448',
+      dispSub: '2 displacement options', torqueSub: '31 500 Nm @ 4 400 cm³', powerSub: 'continuous, no gears',
+      speedSub: 'rpm', pressureSub: 'all variants', weightSub: 'kg',
+      control: '1-speed 100% · 2-speed valve 100/50%',
+      shaft: 'Internal splines DIN5480-N140 · no brake' },
+    S2000: { disp: '8 800 – 15 000', torque: '107 400', power: '350', speed: '75 – 130', pressure: '450', weight: '540 – 618',
+      dispSub: '5 displacement options', torqueSub: '63 000 Nm @ 8 800 cm³', powerSub: 'continuous, no gears',
+      speedSub: 'rpm, by displacement', pressureSub: 'all variants', weightSub: 'kg',
+      control: '1-speed · 2-speed 100/50% · asymmetric ratios',
+      shaft: 'Splines N140/N150 · through-shaft W180 · shrink disc D160' },
+    S3000: { disp: '13 200 – 22 500', torque: '136 000', power: '500', speed: '50 – 86', pressure: '450', weight: '648 – 738',
+      dispSub: '6 displacement options', torqueSub: '94 500 Nm @ 13 200 cm³', powerSub: 'flagship output',
+      speedSub: 'rpm, by displacement', pressureSub: '380 bar @ 22 500 cm³', weightSub: 'kg',
+      control: '1-speed · 2-speed 100/50% · asymmetric ratios',
+      shaft: 'Splines N150 · through-shaft W180 · shrink disc D160' },
+    S3010: { disp: '13 200 – 22 500', torque: '161 100', power: '500', speed: '50 – 86', pressure: '450', weight: '648 – 738',
+      dispSub: '6 displacement options', torqueSub: 'highest in the lineup', powerSub: 'flagship output',
+      speedSub: 'rpm, by displacement', pressureSub: 'all variants', weightSub: 'kg',
+      control: '1-speed · 2-speed 100/50% · asymmetric ratios',
+      shaft: 'Internal splines DIN5480-N200 · shrink disc D160' },
+    S1100: { disp: '4 400 – 6 300', torque: '45 100', power: '175', speed: '180', pressure: '450', weight: '748 – 766',
+      dispSub: '2 displacement options', torqueSub: '+ 55 000 Nm brake torque', powerSub: 'continuous, no gears',
+      speedSub: 'rpm', pressureSub: 'all variants', weightSub: 'kg, incl. brake',
+      control: '1-speed 100% · 2-speed valve 100/50%',
+      shaft: 'Solid shaft W150 · static wet multi-disc brake SAHR' },
+    S2100: { disp: '8 800 – 15 000', torque: '107 400', power: '350', speed: '75 – 130', pressure: '450', weight: '850 – 868',
+      dispSub: '5 displacement options', torqueSub: '+ 95 000 Nm brake torque', powerSub: 'continuous, no gears',
+      speedSub: 'rpm, by displacement', pressureSub: 'all variants', weightSub: 'kg, incl. brake',
+      control: '1-speed · 2-speed 100/50% · asymmetric ratios',
+      shaft: 'Solid shaft W150 · static wet multi-disc brake SAHR' },
+    S3100: { disp: '13 200 – 22 500', torque: '136 000', power: '500', speed: '50 – 86', pressure: '450', weight: '957 – 975',
+      dispSub: '6 displacement options', torqueSub: '+ 95 000 Nm brake torque', powerSub: 'flagship output',
+      speedSub: 'rpm, by displacement', pressureSub: '380 bar @ 22 500 cm³', weightSub: 'kg, incl. brake',
+      control: '1-speed · 2-speed 100/50% · asymmetric ratios',
+      shaft: 'Solid shaft W150 · static wet multi-disc brake SAHR' }
+  };
+  var UNITS = { disp: 'cm³', torque: 'Nm', power: 'kW', speed: 'rpm', pressure: 'bar', weight: 'kg' };
+
+  var tabs = document.querySelectorAll('.model-tab');
+  var fadeEls = document.querySelectorAll('.mono-fade');
+
+  function setModel(name) {
+    var m = MODELS[name];
+    if (!m) return;
+    fadeEls.forEach(function (el) { el.classList.add('fade-out'); });
+    setTimeout(function () {
+      ['disp', 'torque', 'power', 'speed', 'pressure', 'weight'].forEach(function (k) {
+        var v = document.getElementById('sp-' + k);
+        v.innerHTML = m[k] + '<i>' + UNITS[k] + '</i>';
+        document.getElementById('sp-' + k + '-sub').textContent = m[k + 'Sub'];
+      });
+      document.getElementById('sp-control').textContent = m.control;
+      document.getElementById('sp-shaft').textContent = m.shaft;
+      fadeEls.forEach(function (el) { el.classList.remove('fade-out'); });
+    }, reduced ? 0 : 220);
+  }
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) { t.setAttribute('aria-pressed', t === tab); });
+      setModel(tab.dataset.model);
+    });
+  });
+  setModel('S1000');
+})();
+</script>
+</body>
+</html>
